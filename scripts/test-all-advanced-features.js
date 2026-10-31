@@ -6,7 +6,7 @@
  * Feature 4: Booking Cancellation, Policy Enforcement, Seat Release, and Refund Processing
  */
 
-const GATEWAY_URL = "http://localhost:5000";
+const GATEWAY_URL = process.env.GATEWAY_URL || "http://localhost:5000";
 
 let totalPassed = 0;
 let totalFailed = 0;

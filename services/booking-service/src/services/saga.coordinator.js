@@ -108,7 +108,7 @@ export const sagaCoordinator = {
       await seatLockService.releaseLocks(eventId, seats);
 
       // Broadcast real-time permanent seat booking to Socket.IO event room
-      fetch("http://localhost:5000/api/realtime/broadcast", {
+      fetch(`${config.apiGatewayUrl}/api/realtime/broadcast`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -129,7 +129,7 @@ export const sagaCoordinator = {
       }).catch(() => {});
 
       // Synchronize with API Gateway notification inbox
-      await fetch("http://localhost:5000/api/notifications", {
+      await fetch(`${config.apiGatewayUrl}/api/notifications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

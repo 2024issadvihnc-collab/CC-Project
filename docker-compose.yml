@@ -97,6 +97,7 @@ services:
       TICKET_SERVICE_URL: http://ticket-service:5005
       EVENT_SERVICE_URL: http://event-service:5002
       AUTH_SERVICE_URL: http://auth-service:5001
+      API_GATEWAY_URL: http://api-gateway:5000
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
     expose:

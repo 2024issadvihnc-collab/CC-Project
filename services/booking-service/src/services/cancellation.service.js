@@ -209,7 +209,7 @@ export const cancellationService = {
     const seats = booking.seats || [];
     if (eventId && seats.length > 0) {
       await seatLockService.releaseLocks(eventId, seats).catch(() => {});
-      fetch("http://localhost:5000/api/realtime/broadcast", {
+      fetch(`${config.apiGatewayUrl}/api/realtime/broadcast`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -250,7 +250,7 @@ export const cancellationService = {
         },
       }).catch(() => {});
 
-      fetch("http://localhost:5000/api/notifications", {
+      fetch(`${config.apiGatewayUrl}/api/notifications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

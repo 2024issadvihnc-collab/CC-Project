@@ -10,6 +10,7 @@ export const config = {
   ticketServiceUrl: process.env.TICKET_SERVICE_URL || "http://localhost:5005",
   eventServiceUrl: process.env.EVENT_SERVICE_URL || "http://localhost:5002",
   authServiceUrl: process.env.AUTH_SERVICE_URL || "http://localhost:5001",
+  apiGatewayUrl: process.env.API_GATEWAY_URL || "http://api-gateway:5000",
   jwtSecret: process.env.JWT_SECRET || "showtime-production-jwt-secret-key-change-in-prod",
   corsOrigins: (process.env.CORS_ORIGIN || "http://localhost:5173,http://localhost:5000,http://localhost:3000")
     .split(",")
