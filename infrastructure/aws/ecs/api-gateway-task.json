@@ -1,0 +1,54 @@
+{
+  "family": "showtime-api-gateway",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::123456789012:role/showtimeGatewayTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "api-gateway",
+      "image": "123456789012.dkr.ecr.ap-south-1.amazonaws.com/showtime/api-gateway:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "hostPort": 5000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "NODE_ENV", "value": "production" },
+        { "name": "PORT", "value": "5000" },
+        { "name": "AUTH_SERVICE_URL", "value": "http://auth.internal.showtime.local:5001" },
+        { "name": "EVENT_SERVICE_URL", "value": "http://event.internal.showtime.local:5002" },
+        { "name": "BOOKING_SERVICE_URL", "value": "http://booking.internal.showtime.local:5003" },
+        { "name": "PAYMENT_SERVICE_URL", "value": "http://payment.internal.showtime.local:5004" },
+        { "name": "TICKET_SERVICE_URL", "value": "http://ticket.internal.showtime.local:5005" }
+      ],
+      "secrets": [
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:123456789012:secret:showtime/prod/jwt-secret"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/showtime-api-gateway",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 15
+      }
+    }
+  ]
+}
+

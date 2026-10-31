@@ -1,0 +1,22 @@
+{
+  "name": "showtime-event-service",
+  "version": "1.0.0",
+  "description": "ShowTime Event Catalog & Scheduling Microservice",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^18.0.9",
+    "express": "^4.21.1",
+    "express-rate-limit": "^8.7.2",
+    "helmet": "^8.3.0",
+    "ioredis": "^6.0.0",
+    "morgan": "^1.12.1",
+    "pg": "^8.23.1"
+  }
+}
+

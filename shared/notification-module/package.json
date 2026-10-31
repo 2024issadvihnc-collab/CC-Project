@@ -1,0 +1,11 @@
+{
+  "name": "@showtime/notification-module",
+  "version": "1.0.0",
+  "description": "ShowTime Email and In-App Notification Module",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "nodemailer": "^6.9.16"
+  }
+}
+

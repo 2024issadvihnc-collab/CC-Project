@@ -1,0 +1,912 @@
+[
+  {
+    "id": "e001",
+    "title": "A.R. Rahman – The Wonderment Tour",
+    "subtitle": "Live with full orchestra · Special Laser Show",
+    "category": "music",
+    "date": "2026-11-21",
+    "time": "7:00 PM",
+    "duration": "3h",
+    "venue": "Jawaharlal Nehru Stadium",
+    "city": "Delhi",
+    "price": 1499,
+    "maxPrice": 9999,
+    "image": "/images/events/e001.jpg",
+    "rating": 4.9,
+    "votes": 24870,
+    "tags": [
+      "Live Orchestra",
+      "World Tour",
+      "Iconic"
+    ],
+    "description": "Witness the Oscar-winning maestro A.R. Rahman live in concert on his record-breaking Wonderment Tour. An immersive audio-visual spectacle featuring a 60-piece live orchestra, stunning laser projection mapping, and an unforgettable setlist spanning three decades of musical genius.",
+    "cast": [
+      {
+        "name": "A.R. Rahman",
+        "role": "Composer / Vocalist"
+      },
+      {
+        "name": "Ranjit Barot",
+        "role": "Drums"
+      },
+      {
+        "name": "Naveen Kumar",
+        "role": "Conductor"
+      }
+    ],
+    "totalSeats": 45000,
+    "filledPct": 0.82
+  },
+  {
+    "id": "e002",
+    "title": "Diljit Dosanjh – Aura India Tour",
+    "subtitle": "Stadium Concert · High Energy Production",
+    "category": "music",
+    "date": "2026-11-27",
+    "time": "6:30 PM",
+    "duration": "2.5h",
+    "venue": "Mahalaxmi Race Course",
+    "city": "Mumbai",
+    "price": 999,
+    "maxPrice": 7999,
+    "image": "/images/events/e002.jpg",
+    "rating": 4.8,
+    "votes": 38210,
+    "tags": [
+      "Stadium Show",
+      "Live Nation",
+      "Sold Out Zone"
+    ],
+    "description": "After conquering global stages, Diljit Dosanjh brings his electrifying Aura Tour back to India. Expect high-energy performances, massive production, and hits from his entire discography. Don't miss the biggest Punjabi concert of the year!",
+    "cast": [
+      {
+        "name": "Diljit Dosanjh",
+        "role": "Vocalist / Performer"
+      },
+      {
+        "name": "DJ H",
+        "role": "DJ"
+      }
+    ],
+    "totalSeats": 65000,
+    "filledPct": 0.91
+  },
+  {
+    "id": "e003",
+    "title": "Diljit Dosanjh – Aura India Tour",
+    "subtitle": "Stadium Concert · Ahmedabad Edition",
+    "category": "music",
+    "date": "2026-11-21",
+    "time": "7:00 PM",
+    "duration": "2.5h",
+    "venue": "Narendra Modi Stadium",
+    "city": "Ahmedabad",
+    "price": 999,
+    "maxPrice": 7999,
+    "image": "/images/events/e003.jpg",
+    "rating": 4.8,
+    "votes": 28100,
+    "tags": [
+      "Biggest Stadium India",
+      "Live Nation"
+    ],
+    "description": "Diljit Dosanjh's Aura Tour hits the world's largest cricket stadium in Ahmedabad. A night of power-packed performances and unforgettable memories.",
+    "cast": [
+      {
+        "name": "Diljit Dosanjh",
+        "role": "Vocalist / Performer"
+      }
+    ],
+    "totalSeats": 90000,
+    "filledPct": 0.78
+  },
+  {
+    "id": "e004",
+    "title": "Shreya Ghoshal Live",
+    "subtitle": "A Night of Classical Melodies",
+    "category": "music",
+    "date": "2026-11-22",
+    "time": "7:30 PM",
+    "duration": "2h",
+    "venue": "District Arena by Terraform",
+    "city": "Bengaluru",
+    "price": 799,
+    "maxPrice": 4999,
+    "image": "/images/events/e004.jpg",
+    "rating": 4.9,
+    "votes": 19540,
+    "tags": [
+      "Soulful",
+      "Live Band",
+      "Premium"
+    ],
+    "description": "India's most beloved classical-pop singer Shreya Ghoshal performs live at the stunning District Arena. Expect timeless Bollywood classics, devotional numbers, and new-age hits accompanied by a live ensemble.",
+    "cast": [
+      {
+        "name": "Shreya Ghoshal",
+        "role": "Vocalist"
+      },
+      {
+        "name": "Shaan",
+        "role": "Special Guest"
+      }
+    ],
+    "totalSeats": 8000,
+    "filledPct": 0.67
+  },
+  {
+    "id": "e005",
+    "title": "Shillong Cherry Blossom Festival 2026",
+    "subtitle": "3-Day Music & Culture Extravaganza",
+    "category": "festival",
+    "date": "2026-11-20",
+    "time": "4:00 PM",
+    "duration": "3 Days",
+    "venue": "Ward's Lake Grounds",
+    "city": "Shillong",
+    "price": 599,
+    "maxPrice": 2999,
+    "image": "/images/events/e005.jpg",
+    "rating": 4.7,
+    "votes": 11200,
+    "tags": [
+      "Festival Pass",
+      "Multi-Day",
+      "Cultural"
+    ],
+    "description": "One of India's most spectacular festivals set against the backdrop of blooming cherry blossoms. Features international headliners, indie local acts, art installations, food stalls, and the breathtaking natural beauty of Meghalaya.",
+    "cast": [
+      {
+        "name": "Soulmate",
+        "role": "Blues / Rock"
+      },
+      {
+        "name": "Lou Majaw",
+        "role": "Indie Legend"
+      },
+      {
+        "name": "Various International Artists",
+        "role": "Headliners"
+      }
+    ],
+    "totalSeats": 15000,
+    "filledPct": 0.55
+  },
+  {
+    "id": "e006",
+    "title": "Royal Enfield Motoverse 2026",
+    "subtitle": "3-Day Moto Festival · Goa Beach Edition",
+    "category": "festival",
+    "date": "2026-11-28",
+    "time": "10:00 AM",
+    "duration": "3 Days",
+    "venue": "Vagator Beach Grounds",
+    "city": "Goa",
+    "price": 499,
+    "maxPrice": 1999,
+    "image": "/images/events/e006.jpg",
+    "rating": 4.6,
+    "votes": 9870,
+    "tags": [
+      "Moto Culture",
+      "Live Music",
+      "Festival"
+    ],
+    "description": "The iconic Royal Enfield Motoverse returns to Goa with 3 days of dirt tracking, stunt shows, custom bike exhibitions, and heavy-hitting live music including indie artist showcases and massive DJ nights.",
+    "cast": [
+      {
+        "name": "Multiple DJs",
+        "role": "Night Stage"
+      },
+      {
+        "name": "Indie Bands",
+        "role": "Live Music"
+      }
+    ],
+    "totalSeats": 20000,
+    "filledPct": 0.42
+  },
+  {
+    "id": "e007",
+    "title": "India vs Australia – T20I Series",
+    "subtitle": "3rd T20I · Live International Cricket",
+    "category": "cricket",
+    "date": "2026-11-14",
+    "time": "7:00 PM",
+    "duration": "4h",
+    "venue": "Wankhede Stadium",
+    "city": "Mumbai",
+    "price": 750,
+    "maxPrice": 8000,
+    "image": "/images/events/e007.jpg",
+    "rating": 4.9,
+    "votes": 52000,
+    "tags": [
+      "International",
+      "T20",
+      "India vs AUS"
+    ],
+    "description": "The epic India-Australia T20I series comes to the iconic Wankhede Stadium for a crunch decider. Witness world-class cricket action with fireworks, cheerleaders, and the electric atmosphere of Mumbai's favourite cricket ground.",
+    "cast": [
+      {
+        "name": "Team India",
+        "role": "Home Team"
+      },
+      {
+        "name": "Australia",
+        "role": "Visiting Team"
+      }
+    ],
+    "totalSeats": 33000,
+    "filledPct": 0.95
+  },
+  {
+    "id": "e008",
+    "title": "IPL 2027 Pre-Season Warm Up",
+    "subtitle": "Exhibition Match · Mumbai Indians vs CSK",
+    "category": "cricket",
+    "date": "2026-11-30",
+    "time": "7:30 PM",
+    "duration": "4h",
+    "venue": "DY Patil Stadium",
+    "city": "Mumbai",
+    "price": 500,
+    "maxPrice": 5000,
+    "image": "/images/events/e008.jpg",
+    "rating": 4.7,
+    "votes": 31500,
+    "tags": [
+      "Exhibition",
+      "IPL Stars",
+      "Fan Event"
+    ],
+    "description": "The two greatest IPL franchises face off in an exciting pre-season exhibition. See your favourite IPL stars in action before the main season kicks off — complete with DJ night and fan-meets after the match!",
+    "cast": [
+      {
+        "name": "Mumbai Indians",
+        "role": "Team 1"
+      },
+      {
+        "name": "Chennai Super Kings",
+        "role": "Team 2"
+      }
+    ],
+    "totalSeats": 55000,
+    "filledPct": 0.71
+  },
+  {
+    "id": "e009",
+    "title": "Pro Kabaddi League – Season 12 Finals",
+    "subtitle": "Live Sport · Grand Finale Night",
+    "category": "sports",
+    "date": "2026-11-18",
+    "time": "8:00 PM",
+    "duration": "3h",
+    "venue": "Indira Gandhi Indoor Stadium",
+    "city": "Delhi",
+    "price": 299,
+    "maxPrice": 2000,
+    "image": "/images/events/e009.jpg",
+    "rating": 4.5,
+    "votes": 8760,
+    "tags": [
+      "Kabaddi",
+      "Finals",
+      "LIVE"
+    ],
+    "description": "The biggest night in Indian Kabaddi! Two powerhouse franchises battle for the ultimate glory at the Pro Kabaddi League Season 12 Grand Finale. High-octane action, electrifying atmosphere guaranteed.",
+    "cast": [
+      {
+        "name": "Patna Pirates",
+        "role": "Team 1"
+      },
+      {
+        "name": "Dabang Delhi",
+        "role": "Team 2"
+      }
+    ],
+    "totalSeats": 14000,
+    "filledPct": 0.6
+  },
+  {
+    "id": "e010",
+    "title": "ISL – Mumbai City FC vs Bengaluru FC",
+    "subtitle": "Indian Super League · Derby Night",
+    "category": "sports",
+    "date": "2026-11-09",
+    "time": "7:30 PM",
+    "duration": "2h",
+    "venue": "DY Patil Stadium",
+    "city": "Mumbai",
+    "price": 299,
+    "maxPrice": 3000,
+    "image": "/images/events/e010.jpg",
+    "rating": 4.4,
+    "votes": 7200,
+    "tags": [
+      "Football",
+      "ISL",
+      "Derby"
+    ],
+    "description": "One of the most fiercely contested rivalries in the Indian Super League — Mumbai City FC take on Bengaluru FC in a high-stakes derby. Experience live football at its most electric!",
+    "cast": [
+      {
+        "name": "Mumbai City FC",
+        "role": "Home"
+      },
+      {
+        "name": "Bengaluru FC",
+        "role": "Away"
+      }
+    ],
+    "totalSeats": 55000,
+    "filledPct": 0.48
+  },
+  {
+    "id": "e011",
+    "title": "SUPERSONIC INDIA 2026",
+    "subtitle": "Multi-Stage Electronic Music Festival",
+    "category": "dj",
+    "date": "2026-11-07",
+    "time": "5:00 PM",
+    "duration": "10h",
+    "venue": "MMRDA Grounds",
+    "city": "Mumbai",
+    "price": 1499,
+    "maxPrice": 5999,
+    "image": "/images/events/e011.jpg",
+    "rating": 4.8,
+    "votes": 22100,
+    "tags": [
+      "EDM",
+      "Multi-Stage",
+      "All Night"
+    ],
+    "description": "India's biggest electronic music festival returns with 4 stages, 30+ international DJs, stunning light installations, and 12 hours of non-stop electronic euphoria. Featuring Techno, House, Trance, and Bass music across dedicated stages.",
+    "cast": [
+      {
+        "name": "Martin Garrix",
+        "role": "Headliner"
+      },
+      {
+        "name": "Blasterjaxx",
+        "role": "Main Stage"
+      },
+      {
+        "name": "Zaeden",
+        "role": "India Stage"
+      },
+      {
+        "name": "DJ Chetas",
+        "role": "Bollywood Beats Stage"
+      }
+    ],
+    "totalSeats": 30000,
+    "filledPct": 0.88
+  },
+  {
+    "id": "e012",
+    "title": "ECHOES – Electronic Sunset Session",
+    "subtitle": "Open Air DJ Night · Beachside",
+    "category": "dj",
+    "date": "2026-11-15",
+    "time": "4:00 PM",
+    "duration": "8h",
+    "venue": "Ozran Beach Shack",
+    "city": "Goa",
+    "price": 699,
+    "maxPrice": 2999,
+    "image": "/images/events/e012.jpg",
+    "rating": 4.6,
+    "votes": 6450,
+    "tags": [
+      "Sunset",
+      "Beach",
+      "House Music"
+    ],
+    "description": "The ultimate beachside DJ experience in Goa. Watch the sun set over the Arabian Sea to deep house music before the night turns into an all-out trance and electronic extravaganza under the stars.",
+    "cast": [
+      {
+        "name": "Arjun Vagale",
+        "role": "Headliner"
+      },
+      {
+        "name": "Kohra",
+        "role": "B2B Set"
+      }
+    ],
+    "totalSeats": 3000,
+    "filledPct": 0.73
+  },
+  {
+    "id": "e013",
+    "title": "Zakir Khan – Tathastu World Tour",
+    "subtitle": "Stand-Up Comedy Special · Live",
+    "category": "comedy",
+    "date": "2026-11-12",
+    "time": "8:00 PM",
+    "duration": "1.5h",
+    "venue": "Nehru Centre Auditorium",
+    "city": "Mumbai",
+    "price": 499,
+    "maxPrice": 1999,
+    "image": "/images/events/e013.jpg",
+    "rating": 4.9,
+    "votes": 16780,
+    "tags": [
+      "Stand-Up",
+      "Hindi",
+      "Award Winning"
+    ],
+    "description": "India's most beloved stand-up comedian Zakir Khan brings his new Tathastu World Tour to Mumbai. Expect side-splitting stories, sharp observations, and the warmth that has made 'Sakht Launda' a national phenomenon.",
+    "cast": [
+      {
+        "name": "Zakir Khan",
+        "role": "Comedian"
+      }
+    ],
+    "totalSeats": 2000,
+    "filledPct": 0.96
+  },
+  {
+    "id": "e014",
+    "title": "Kenny Sebastian: The Overthinker Returns",
+    "subtitle": "Comedy Night · English & Hindi",
+    "category": "comedy",
+    "date": "2026-11-25",
+    "time": "7:30 PM",
+    "duration": "1.5h",
+    "venue": "Alliance Française",
+    "city": "Bengaluru",
+    "price": 399,
+    "maxPrice": 1499,
+    "image": "/images/events/e014.jpg",
+    "rating": 4.7,
+    "votes": 9320,
+    "tags": [
+      "Stand-Up",
+      "English",
+      "Millennial Humour"
+    ],
+    "description": "Kenny Sebastian brings his new solo special to Bengaluru — the city that gave birth to his career. Fresh material, new observations, and the wit that has made him one of India's top comedic voices.",
+    "cast": [
+      {
+        "name": "Kenny Sebastian",
+        "role": "Comedian"
+      }
+    ],
+    "totalSeats": 400,
+    "filledPct": 0.85
+  },
+  {
+    "id": "e015",
+    "title": "A.R. Rahman – The Wonderment Tour",
+    "subtitle": "Mumbai Edition · Jio World Garden",
+    "category": "music",
+    "date": "2026-11-01",
+    "time": "7:00 PM",
+    "duration": "3h",
+    "venue": "Jio World Garden",
+    "city": "Mumbai",
+    "price": 1499,
+    "maxPrice": 9999,
+    "image": "/images/events/e015.jpg",
+    "rating": 4.9,
+    "votes": 31200,
+    "tags": [
+      "Live Orchestra",
+      "World Tour",
+      "Sold Out"
+    ],
+    "description": "The Wonderment Tour kicks off in Mumbai — A.R. Rahman and his 60-piece orchestra transform Jio World Garden into a breathtaking sensory experience.",
+    "cast": [
+      {
+        "name": "A.R. Rahman",
+        "role": "Composer / Vocalist"
+      },
+      {
+        "name": "Ranjit Barot",
+        "role": "Drums"
+      }
+    ],
+    "totalSeats": 20000,
+    "filledPct": 0.99
+  },
+  {
+    "id": "e016",
+    "title": "Diljit Dosanjh – Aura India Tour",
+    "subtitle": "Bengaluru Edition · NICE Grounds",
+    "category": "music",
+    "date": "2026-11-29",
+    "time": "6:30 PM",
+    "duration": "2.5h",
+    "venue": "NICE Grounds",
+    "city": "Bengaluru",
+    "price": 999,
+    "maxPrice": 7999,
+    "image": "/images/events/e016.jpg",
+    "rating": 4.8,
+    "votes": 21880,
+    "tags": [
+      "Stadium Show",
+      "Live Nation"
+    ],
+    "description": "The Aura Tour concludes its India leg in Bengaluru with what promises to be the biggest show of the series. Massive production, full band, and special surprises.",
+    "cast": [
+      {
+        "name": "Diljit Dosanjh",
+        "role": "Vocalist / Performer"
+      }
+    ],
+    "totalSeats": 40000,
+    "filledPct": 0.84
+  },
+  {
+    "id": "e017",
+    "title": "Sunidhi Chauhan Live in Concert",
+    "subtitle": "I Am Home India Tour · High-Energy Stage Experience",
+    "category": "music",
+    "date": "2026-11-28",
+    "time": "7:00 PM",
+    "duration": "3h",
+    "venue": "Gachibowli Stadium",
+    "city": "Hyderabad",
+    "price": 999,
+    "maxPrice": 6999,
+    "image": "/images/events/e001.jpg",
+    "rating": 4.9,
+    "votes": 18450,
+    "tags": [
+      "Live Concert",
+      "Bollywood",
+      "Chartbusters"
+    ],
+    "description": "Experience the powerhouse vocals of Sunidhi Chauhan live in Hyderabad with an explosive setlist of iconic Bollywood tracks.",
+    "cast": [
+      {
+        "name": "Sunidhi Chauhan",
+        "role": "Lead Vocalist"
+      }
+    ],
+    "totalSeats": 30000,
+    "filledPct": 0.78
+  },
+  {
+    "id": "e018",
+    "title": "Sunburn Arena ft. Alan Walker",
+    "subtitle": "WalkerWorld Tour Hyderabad Edition",
+    "category": "dj",
+    "date": "2026-12-05",
+    "time": "6:00 PM",
+    "duration": "4h",
+    "venue": "Hitex Exhibition Center",
+    "city": "Hyderabad",
+    "price": 1200,
+    "maxPrice": 5500,
+    "image": "/images/events/e011.jpg",
+    "rating": 4.8,
+    "votes": 14200,
+    "tags": [
+      "EDM",
+      "Festival",
+      "Global DJ"
+    ],
+    "description": "Alan Walker returns to Hyderabad with the sensational WalkerWorld Tour. Expect signature beats, visual storytelling, and laser production.",
+    "cast": [
+      {
+        "name": "Alan Walker",
+        "role": "Headliner DJ"
+      }
+    ],
+    "totalSeats": 25000,
+    "filledPct": 0.65
+  },
+  {
+    "id": "e019",
+    "title": "Anirudh Ravichander – Hukum Tour",
+    "subtitle": "Rockstar Anirudh Live Stadium Concert",
+    "category": "music",
+    "date": "2026-11-22",
+    "time": "7:00 PM",
+    "duration": "3.5h",
+    "venue": "Jawaharlal Nehru Stadium",
+    "city": "Chennai",
+    "price": 1299,
+    "maxPrice": 8999,
+    "image": "/images/events/e002.jpg",
+    "rating": 5,
+    "votes": 38900,
+    "tags": [
+      "Rockstar",
+      "Hukum",
+      "Massive Production"
+    ],
+    "description": "The biggest musical extravaganza in South India. Rockstar Anirudh live in his home ground with a stadium full of energy and chartbuster hits.",
+    "cast": [
+      {
+        "name": "Anirudh Ravichander",
+        "role": "Music Director / Vocalist"
+      }
+    ],
+    "totalSeats": 42000,
+    "filledPct": 0.94
+  },
+  {
+    "id": "e020",
+    "title": "Chennai Super Kings Fan Fest & Match",
+    "subtitle": "T20 Super League Exhibition Match",
+    "category": "cricket",
+    "date": "2026-12-12",
+    "time": "7:30 PM",
+    "duration": "4h",
+    "venue": "MA Chidambaram Stadium (Chepauk)",
+    "city": "Chennai",
+    "price": 750,
+    "maxPrice": 5000,
+    "image": "/images/events/e007.jpg",
+    "rating": 4.9,
+    "votes": 31200,
+    "tags": [
+      "Yellow Brigade",
+      "T20 Cricket",
+      "Chepauk"
+    ],
+    "description": "Feel the whistle podu passion at Chepauk! T20 exhibition game with top players, cheer routines, and fan zone activities.",
+    "cast": [
+      {
+        "name": "MS Dhoni",
+        "role": "Captain"
+      },
+      {
+        "name": "Ruturaj Gaikwad",
+        "role": "Batsman"
+      }
+    ],
+    "totalSeats": 38000,
+    "filledPct": 0.88
+  },
+  {
+    "id": "e021",
+    "title": "Arijit Singh – Homecoming Concert",
+    "subtitle": "Live in Kolkata · Symphony Orchestra Tour",
+    "category": "music",
+    "date": "2026-12-18",
+    "time": "6:30 PM",
+    "duration": "3h",
+    "venue": "Salt Lake Stadium",
+    "city": "Kolkata",
+    "price": 1499,
+    "maxPrice": 9999,
+    "image": "/images/events/e001.jpg",
+    "rating": 5,
+    "votes": 45200,
+    "tags": [
+      "Homecoming",
+      "Soulful",
+      "Stadium Live"
+    ],
+    "description": "The voice of the nation returns home. Arijit Singh performs live in Kolkata with a grand orchestra and heartfelt classics.",
+    "cast": [
+      {
+        "name": "Arijit Singh",
+        "role": "Lead Vocalist"
+      }
+    ],
+    "totalSeats": 50000,
+    "filledPct": 0.96
+  },
+  {
+    "id": "e022",
+    "title": "Kolkata International Jazz Festival",
+    "subtitle": "World Jazz & Fusion Weekend",
+    "category": "festival",
+    "date": "2026-12-06",
+    "time": "4:00 PM",
+    "duration": "5h",
+    "venue": "Nicco Park Grounds",
+    "city": "Kolkata",
+    "price": 800,
+    "maxPrice": 3500,
+    "image": "/images/events/e005.jpg",
+    "rating": 4.7,
+    "votes": 8900,
+    "tags": [
+      "Jazz",
+      "World Music",
+      "Open Air"
+    ],
+    "description": "International jazz ensembles, Latin fusion, and experimental blues in an atmospheric winter open-air setting in Kolkata.",
+    "cast": [
+      {
+        "name": "Louiz Banks",
+        "role": "Keyboard Maestro"
+      }
+    ],
+    "totalSeats": 12000,
+    "filledPct": 0.7
+  },
+  {
+    "id": "e023",
+    "title": "NH7 Weekender Pune 2026",
+    "subtitle": "The Happiest Music Festival Celebrates 15 Years",
+    "category": "festival",
+    "date": "2026-12-04",
+    "time": "3:00 PM",
+    "duration": "8h",
+    "venue": "Mahalakshmi Lawns",
+    "city": "Pune",
+    "price": 1899,
+    "maxPrice": 7500,
+    "image": "/images/events/e006.jpg",
+    "rating": 4.9,
+    "votes": 27500,
+    "tags": [
+      "Multi-Genre",
+      "Indie",
+      "Weekend Festival"
+    ],
+    "description": "India's landmark indie music celebration featuring 5 stages, 40+ artists across indie, hip-hop, metal, and world music.",
+    "cast": [
+      {
+        "name": "Prateek Kuhad",
+        "role": "Singer-Songwriter"
+      },
+      {
+        "name": "Nucleya",
+        "role": "Bass Producer"
+      }
+    ],
+    "totalSeats": 25000,
+    "filledPct": 0.85
+  },
+  {
+    "id": "e024",
+    "title": "Vir Das: Mind Fool Comedy Special",
+    "subtitle": "Emmy-Winner Live in Pune",
+    "category": "comedy",
+    "date": "2026-11-29",
+    "time": "8:00 PM",
+    "duration": "1.5h",
+    "venue": "Balewadi Indoor Stadium",
+    "city": "Pune",
+    "price": 799,
+    "maxPrice": 3500,
+    "image": "/images/events/e014.jpg",
+    "rating": 4.8,
+    "votes": 11400,
+    "tags": [
+      "Standup Comedy",
+      "Emmy Winner",
+      "Uncensored"
+    ],
+    "description": "Vir Das brings his globe-trotting comedy special Mind Fool to Pune with sharp observations on modern life and culture.",
+    "cast": [
+      {
+        "name": "Vir Das",
+        "role": "Standup Comedian"
+      }
+    ],
+    "totalSeats": 6000,
+    "filledPct": 0.8
+  },
+  {
+    "id": "e025",
+    "title": "Jaipur Literature & Music Festival",
+    "subtitle": "Words, Rhythms & Heritage under the Desert Sky",
+    "category": "festival",
+    "date": "2026-12-20",
+    "time": "10:00 AM",
+    "duration": "10h",
+    "venue": "Hotel Clarks Amer",
+    "city": "Jaipur",
+    "price": 499,
+    "maxPrice": 2999,
+    "image": "/images/events/e005.jpg",
+    "rating": 4.9,
+    "votes": 19800,
+    "tags": [
+      "Literature",
+      "Folk Music",
+      "Heritage"
+    ],
+    "description": "The grandest confluence of literary minds, desert folk melodies, and global speakers in the Pink City.",
+    "cast": [
+      {
+        "name": "William Dalrymple",
+        "role": "Author / Speaker"
+      }
+    ],
+    "totalSeats": 15000,
+    "filledPct": 0.72
+  },
+  {
+    "id": "e026",
+    "title": "Rajasthan Royals T20 Cricket Showdown",
+    "subtitle": "Pre-Season Match & Fan Carnival",
+    "category": "cricket",
+    "date": "2026-11-30",
+    "time": "7:00 PM",
+    "duration": "4h",
+    "venue": "Sawai Mansingh Stadium",
+    "city": "Jaipur",
+    "price": 850,
+    "maxPrice": 4500,
+    "image": "/images/events/e008.jpg",
+    "rating": 4.8,
+    "votes": 16700,
+    "tags": [
+      "Halla Bol",
+      "T20 Match",
+      "Pink City"
+    ],
+    "description": "High-octane T20 action at the iconic SMS Stadium with Rajasthan's finest batsmen in explosive form.",
+    "cast": [
+      {
+        "name": "Sanju Samson",
+        "role": "Captain / Wicketkeeper"
+      }
+    ],
+    "totalSeats": 30000,
+    "filledPct": 0.76
+  },
+  {
+    "id": "e027",
+    "title": "Indore Comedy Carnival – Bassi & Friends",
+    "subtitle": "Anubhav Singh Bassi Live in Indore",
+    "category": "comedy",
+    "date": "2026-12-14",
+    "time": "7:30 PM",
+    "duration": "2h",
+    "venue": "Brilliant Convention Centre",
+    "city": "Indore",
+    "price": 699,
+    "maxPrice": 3200,
+    "image": "/images/events/e013.jpg",
+    "rating": 4.9,
+    "votes": 14600,
+    "tags": [
+      "Standup Comedy",
+      "Bassi",
+      "Laugh Riot"
+    ],
+    "description": "Bassi's hilarious storytelling takes over Indore for one night of nonstop laughter and relatable stories.",
+    "cast": [
+      {
+        "name": "Anubhav Singh Bassi",
+        "role": "Standup Comedian"
+      }
+    ],
+    "totalSeats": 5000,
+    "filledPct": 0.91
+  },
+  {
+    "id": "e028",
+    "title": "Indore Sunsets EDM Festival",
+    "subtitle": "Madhya Pradesh's Biggest Open-Air Electronic Festival",
+    "category": "dj",
+    "date": "2026-12-21",
+    "time": "5:00 PM",
+    "duration": "6h",
+    "venue": "Labh Mandapam Grounds",
+    "city": "Indore",
+    "price": 599,
+    "maxPrice": 2800,
+    "image": "/images/events/e012.jpg",
+    "rating": 4.7,
+    "votes": 9800,
+    "tags": [
+      "Electronic",
+      "Sunset Party",
+      "Youth Fest"
+    ],
+    "description": "Central India's leading electronic festival with top national DJs, food trucks, and light installations.",
+    "cast": [
+      {
+        "name": "Zaeden",
+        "role": "DJ / Music Producer"
+      }
+    ],
+    "totalSeats": 10000,
+    "filledPct": 0.68
+  }
+]

@@ -1,0 +1,60 @@
+{
+  "family": "showtime-booking-service",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::123456789012:role/showtimeBookingTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "booking-service",
+      "image": "123456789012.dkr.ecr.ap-south-1.amazonaws.com/showtime/booking-service:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 5003,
+          "hostPort": 5003,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "NODE_ENV", "value": "production" },
+        { "name": "PORT", "value": "5003" },
+        { "name": "PAYMENT_SERVICE_URL", "value": "http://payment.internal.showtime.local:5004" },
+        { "name": "TICKET_SERVICE_URL", "value": "http://ticket.internal.showtime.local:5005" },
+        { "name": "EVENT_SERVICE_URL", "value": "http://event.internal.showtime.local:5002" }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:123456789012:secret:showtime/prod/booking-db-url"
+        },
+        {
+          "name": "REDIS_URL",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:123456789012:secret:showtime/prod/elasticache-url"
+        },
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:123456789012:secret:showtime/prod/jwt-secret"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/showtime-booking-service",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:5003/health || exit 1"],
+        "interval": 15,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 15
+      }
+    }
+  ]
+}
+

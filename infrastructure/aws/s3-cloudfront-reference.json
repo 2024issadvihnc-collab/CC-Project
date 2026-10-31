@@ -1,0 +1,85 @@
+{
+  "Description": "Amazon S3 & CloudFront Origin Access Control (OAC) Configuration Reference for ShowTime",
+  "S3Bucket": {
+    "BucketName": "showtime-frontend-production",
+    "PublicAccessBlock": {
+      "BlockPublicAcls": true,
+      "IgnorePublicAcls": true,
+      "BlockPublicPolicy": true,
+      "RestrictPublicBuckets": true
+    },
+    "BucketPolicy": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Sid": "AllowCloudFrontServicePrincipalReadOnly",
+          "Effect": "Allow",
+          "Principal": {
+            "Service": "cloudfront.amazonaws.com"
+          },
+          "Action": "s3:GetObject",
+          "Resource": "arn:aws:s3:::showtime-frontend-production/*",
+          "Condition": {
+            "StringEquals": {
+              "AWS:SourceArn": "arn:aws:cloudfront::123456789012:distribution/EDFDVBD632BHDS5"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "CloudFrontDistribution": {
+    "Comment": "ShowTime Global CDN Distribution",
+    "PriceClass": "PriceClass_100",
+    "DefaultRootObject": "index.html",
+    "Origins": [
+      {
+        "Id": "S3-ShowTime-Frontend",
+        "DomainName": "showtime-frontend-production.s3.ap-south-1.amazonaws.com",
+        "OriginAccessControlId": "E2F1234567890"
+      },
+      {
+        "Id": "ALB-ShowTime-Backend",
+        "DomainName": "showtime-alb-12345678.ap-south-1.elb.amazonaws.com",
+        "CustomOriginConfig": {
+          "HTTPPort": 80,
+          "HTTPSPort": 443,
+          "OriginProtocolPolicy": "https-only"
+        }
+      }
+    ],
+    "DefaultCacheBehavior": {
+      "TargetOriginId": "S3-ShowTime-Frontend",
+      "ViewerProtocolPolicy": "redirect-to-https",
+      "AllowedMethods": ["GET", "HEAD", "OPTIONS"],
+      "CachedMethods": ["GET", "HEAD"]
+    },
+    "CacheBehaviors": [
+      {
+        "PathPattern": "/api/*",
+        "TargetOriginId": "ALB-ShowTime-Backend",
+        "ViewerProtocolPolicy": "redirect-to-https",
+        "AllowedMethods": ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"],
+        "ForwardedValues": {
+          "QueryString": true,
+          "Headers": ["Authorization", "Content-Type", "Accept", "X-Idempotency-Key"]
+        }
+      }
+    ],
+    "CustomErrorResponses": [
+      {
+        "ErrorCode": 403,
+        "ResponseCode": 200,
+        "ResponsePagePath": "/index.html",
+        "ErrorCachingMinTTL": 0
+      },
+      {
+        "ErrorCode": 404,
+        "ResponseCode": 200,
+        "ResponsePagePath": "/index.html",
+        "ErrorCachingMinTTL": 0
+      }
+    ]
+  }
+}
+

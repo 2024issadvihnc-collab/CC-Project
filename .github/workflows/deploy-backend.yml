@@ -1,0 +1,95 @@
+ 
+name: Deploy ShowTime Backend to AWS EC2
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-backend:
+    name: Deploy Backend Suite (EC2 Instance 2)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials via GitHub OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_BACKEND_OIDC_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-south-1' }}
+          role-session-name: GitHubActions-DeployBackend
+
+      - name: Deploy Backend Services
+        env:
+          BACKEND_INSTANCE_ID: ${{ secrets.AWS_BACKEND_EC2_INSTANCE_ID }}
+        run: |
+          set -e
+
+          COMMAND="cd /home/ec2-user/ShowTime && \
+            git fetch origin && \
+            git checkout main && \
+            git pull --ff-only origin main && \
+            docker compose -f docker-compose.backend.yml up -d --build"
+
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "$BACKEND_INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --parameters "commands=[\"$COMMAND\"]" \
+            --query "Command.CommandId" \
+            --output text)
+
+          aws ssm wait command-executed \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$BACKEND_INSTANCE_ID"
+
+          STATUS=$(aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$BACKEND_INSTANCE_ID" \
+            --query "Status" \
+            --output text)
+
+          if [ "$STATUS" != "Success" ]; then
+            echo "Backend deployment failed."
+            exit 1
+          fi
+
+      - name: Verify Backend Gateway Health
+        env:
+          BACKEND_INSTANCE_ID: ${{ secrets.AWS_BACKEND_EC2_INSTANCE_ID }}
+        run: |
+          set -e
+
+          CHECK_CMD="curl --retry 5 --retry-delay 5 --retry-connrefused -fsS http://localhost:5000/api/health"
+
+          CHECK_ID=$(aws ssm send-command \
+            --instance-ids "$BACKEND_INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --parameters "commands=[\"$CHECK_CMD\"]" \
+            --query "Command.CommandId" \
+            --output text)
+
+          aws ssm wait command-executed \
+            --command-id "$CHECK_ID" \
+            --instance-id "$BACKEND_INSTANCE_ID"
+
+          STATUS=$(aws ssm get-command-invocation \
+            --command-id "$CHECK_ID" \
+            --instance-id "$BACKEND_INSTANCE_ID" \
+            --query "Status" \
+            --output text)
+
+          if [ "$STATUS" != "Success" ]; then
+            echo "Backend health check failed."
+            aws ssm get-command-invocation \
+              --command-id "$CHECK_ID" \
+              --instance-id "$BACKEND_INSTANCE_ID"
+            exit 1
+          fi
+
+          echo "Backend gateway health check passed."
+

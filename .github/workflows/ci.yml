@@ -1,0 +1,121 @@
+name: ShowTime Continuous Integration (CI)
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # =========================================================================
+  # 1. Frontend Build & Static Asset Verification
+  # =========================================================================
+  frontend-build:
+    name: Frontend Build & Bundle Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/showtime/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend/showtime
+        run: npm ci
+
+      - name: Build Production Frontend Bundle
+        working-directory: frontend/showtime
+        env:
+          VITE_API_BASE_URL: /api
+        run: npm run build
+
+      - name: Verify Distribution Artifacts
+        run: |
+          test -d frontend/showtime/dist
+          test -f frontend/showtime/dist/index.html
+          echo "Frontend distribution bundle successfully generated."
+
+  # =========================================================================
+  # 2. Backend Microservices Integration & Regression Testing
+  # =========================================================================
+  backend-test:
+    name: Backend Microservices & Socket.IO Test Suite
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: showtime_test_password
+          POSTGRES_DB: showtime_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Initialize PostgreSQL Database Schemas
+        run: |
+          PGPASSWORD=showtime_test_password psql -h localhost -U postgres -d showtime_db -f infrastructure/database/init-multi-db.sql
+
+      - name: Install Dependencies
+        run: |
+          npm ci || npm install
+          for svc in auth-service event-service booking-service payment-service ticket-service; do
+            npm --prefix services/$svc ci || npm --prefix services/$svc install
+          done
+          npm --prefix api-gateway ci || npm --prefix api-gateway install
+
+      - name: Start Microservices Suite (Background Daemon)
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:showtime_test_password@localhost:5432/showtime_db
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: showtime_ci_jwt_secret_key_32chars_test!
+        run: |
+          node scripts/start-all-microservices.js &
+          sleep 6
+
+      - name: Verify Microservices Health Check
+        run: |
+          curl -f http://localhost:5000/api/health || (echo "API Gateway health check failed" && exit 1)
+
+      - name: Execute Socket.IO Real-Time Seats Test
+        run: node scripts/test-realtime-seats.js
+
+      - name: Execute Advanced Booking Features Test Suite
+        run: node scripts/test-all-advanced-features.js
+
+      - name: Execute Password Change & Settings Security Test
+        run: node scripts/test-password-change.js
+

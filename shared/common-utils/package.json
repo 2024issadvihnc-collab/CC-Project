@@ -1,0 +1,14 @@
+{
+  "name": "@showtime/common-utils",
+  "version": "1.0.0",
+  "description": "Shared utility functions, custom errors, response helpers, and JWT helpers for ShowTime microservices",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2"
+  }
+}
+

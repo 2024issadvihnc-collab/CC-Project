@@ -1,0 +1,28 @@
+# =============================================================================
+# ShowTime Frontend EC2 Stack (docker-compose.frontend.yml)
+# Deployed on EC2 Instance 1 (Public Subnet)
+# Exposes Port 80, proxies /api requests to Backend EC2 Private IP
+# =============================================================================
+
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend/showtime
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api
+    container_name: showtime-frontend
+    restart: unless-stopped
+    environment:
+      # Set to http://<BACKEND_EC2_PRIVATE_IP>:5000 in your .env on Frontend EC2
+      BACKEND_API_URL: ${BACKEND_API_URL:-http://localhost:5000}
+    ports:
+      - "80:80"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+

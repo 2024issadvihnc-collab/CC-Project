@@ -1,0 +1,11 @@
+{
+  "name": "@showtime/event-contracts",
+  "version": "1.0.0",
+  "description": "Shared event schemas and topic definitions for ShowTime asynchronous and Saga communication",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No test specified\" && exit 0"
+  }
+}
+

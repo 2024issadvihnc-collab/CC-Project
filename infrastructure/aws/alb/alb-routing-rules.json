@@ -1,0 +1,97 @@
+{
+  "Description": "AWS Application Load Balancer Path-Based Routing for ShowTime Microservices",
+  "ListenerArn": "arn:aws:elasticloadbalancing:ap-south-1:123456789012:listener/app/showtime-alb/12345678/12345678",
+  "Rules": [
+    {
+      "Priority": 10,
+      "Conditions": [
+        {
+          "Field": "path-pattern",
+          "Values": ["/api/auth/*", "/auth/*"]
+        }
+      ],
+      "Actions": [
+        {
+          "Type": "forward",
+          "TargetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:123456789012:targetgroup/tg-auth-service/1111"
+        }
+      ]
+    },
+    {
+      "Priority": 20,
+      "Conditions": [
+        {
+          "Field": "path-pattern",
+          "Values": ["/api/events/*", "/events/*"]
+        }
+      ],
+      "Actions": [
+        {
+          "Type": "forward",
+          "TargetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:123456789012:targetgroup/tg-event-service/2222"
+        }
+      ]
+    },
+    {
+      "Priority": 30,
+      "Conditions": [
+        {
+          "Field": "path-pattern",
+          "Values": ["/api/bookings/*", "/bookings/*"]
+        }
+      ],
+      "Actions": [
+        {
+          "Type": "forward",
+          "TargetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:123456789012:targetgroup/tg-booking-service/3333"
+        }
+      ]
+    },
+    {
+      "Priority": 40,
+      "Conditions": [
+        {
+          "Field": "path-pattern",
+          "Values": ["/api/payments/*", "/payments/*"]
+        }
+      ],
+      "Actions": [
+        {
+          "Type": "forward",
+          "TargetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:123456789012:targetgroup/tg-payment-service/4444"
+        }
+      ]
+    },
+    {
+      "Priority": 50,
+      "Conditions": [
+        {
+          "Field": "path-pattern",
+          "Values": ["/api/tickets/*", "/tickets/*"]
+        }
+      ],
+      "Actions": [
+        {
+          "Type": "forward",
+          "TargetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:123456789012:targetgroup/tg-ticket-service/5555"
+        }
+      ]
+    },
+    {
+      "Priority": 100,
+      "Conditions": [
+        {
+          "Field": "path-pattern",
+          "Values": ["/api/*"]
+        }
+      ],
+      "Actions": [
+        {
+          "Type": "forward",
+          "TargetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:123456789012:targetgroup/tg-api-gateway/6666"
+        }
+      ]
+    }
+  ]
+}
+

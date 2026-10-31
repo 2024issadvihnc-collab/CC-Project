@@ -1,0 +1,29 @@
+{
+  "LogGroups": [
+    {
+      "logGroupName": "/ecs/showtime-api-gateway",
+      "retentionInDays": 30
+    },
+    {
+      "logGroupName": "/ecs/showtime-auth-service",
+      "retentionInDays": 30
+    },
+    {
+      "logGroupName": "/ecs/showtime-event-service",
+      "retentionInDays": 30
+    },
+    {
+      "logGroupName": "/ecs/showtime-booking-service",
+      "retentionInDays": 30
+    },
+    {
+      "logGroupName": "/ecs/showtime-payment-service",
+      "retentionInDays": 30
+    },
+    {
+      "logGroupName": "/ecs/showtime-ticket-service",
+      "retentionInDays": 30
+    }
+  ]
+}
+
