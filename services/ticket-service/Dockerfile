@@ -1,16 +1,22 @@
-FROM node:20-alpine AS base
+
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy Ticket Service dependencies
+COPY services/ticket-service/package*.json ./
+
 RUN npm install --omit=dev
 
-COPY . .
+# Copy Ticket Service source code
+COPY services/ticket-service/ ./
 
-EXPOSE 5005
+# Include shared project modules
+COPY shared/ /shared/
 
 ENV NODE_ENV=production
 ENV PORT=5005
 
-CMD ["node", "server.js"]
+EXPOSE 5005
 
+CMD ["node", "server.js"]

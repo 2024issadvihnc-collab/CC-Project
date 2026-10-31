@@ -1,15 +1,22 @@
-FROM node:20-alpine AS base
+
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install --omit=dev
-COPY . .
+# Copy Booking Service dependencies
+COPY services/booking-service/package*.json ./
 
-EXPOSE 5003
+RUN npm install --omit=dev
+
+# Copy Booking Service source code
+COPY services/booking-service/ ./
+
+# Include shared project modules
+COPY shared/ /shared/
 
 ENV NODE_ENV=production
 ENV PORT=5003
 
-CMD ["node", "server.js"]
+EXPOSE 5003
 
+CMD ["node", "server.js"]

@@ -1,15 +1,22 @@
-FROM node:20-alpine AS base
+
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy Auth Service dependencies
+COPY services/auth-service/package*.json ./
+
 RUN npm install --omit=dev
 
-COPY . .
+# Copy Auth Service source code
+COPY services/auth-service/ ./
 
-EXPOSE 5001
+# Include shared project modules
+COPY shared/ /shared/
 
 ENV NODE_ENV=production
 ENV PORT=5001
+
+EXPOSE 5001
 
 CMD ["node", "server.js"]

@@ -1,16 +1,22 @@
-FROM node:20-alpine AS base
+
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy Payment Service dependencies
+COPY services/payment-service/package*.json ./
+
 RUN npm install --omit=dev
 
-COPY . .
+# Copy Payment Service source code
+COPY services/payment-service/ ./
 
-EXPOSE 5004
+# Include shared project modules
+COPY shared/ /shared/
 
 ENV NODE_ENV=production
 ENV PORT=5004
 
-CMD ["node", "server.js"]
+EXPOSE 5004
 
+CMD ["node", "server.js"]

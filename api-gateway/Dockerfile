@@ -1,16 +1,22 @@
-FROM node:20-alpine AS base
+
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy API Gateway dependencies
+COPY api-gateway/package*.json ./
+
 RUN npm install --omit=dev
 
-COPY . .
+# Copy API Gateway source code
+COPY api-gateway/ ./
 
-EXPOSE 5000
+# Include shared project modules
+COPY shared/ /shared/
 
 ENV NODE_ENV=production
 ENV PORT=5000
 
-CMD ["node", "server.js"]
+EXPOSE 5000
 
+CMD ["node", "server.js"]
