@@ -2,7 +2,7 @@
  * ShowTime Feature 1 Verification: QR Ticket Scanning, Atomic Admission & Concurrency Protection
  */
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = (process.env.GATEWAY_URL ? process.env.GATEWAY_URL + "/api" : "http://localhost:5000/api");
 
 async function runTicketScannerTests() {
   console.log("======================================================================");

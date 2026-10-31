@@ -6,7 +6,7 @@
 
 import { calculateRefund } from "../services/booking-service/src/services/cancellation.service.js";
 
-const GATEWAY_URL = "http://localhost:5000";
+const GATEWAY_URL = process.env.GATEWAY_URL || "http://localhost:5000";
 
 let passed = 0;
 let failed = 0;
