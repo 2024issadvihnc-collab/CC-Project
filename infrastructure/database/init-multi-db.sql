@@ -6,6 +6,11 @@
 -- Enable extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- Configure default schema search path for microservices connection pool
+ALTER DATABASE showtime_db SET search_path TO auth_schema, event_schema, booking_schema, payment_schema, ticket_schema, notification_schema, public;
+ALTER ROLE postgres SET search_path TO auth_schema, event_schema, booking_schema, payment_schema, ticket_schema, notification_schema, public;
+SET search_path TO auth_schema, event_schema, booking_schema, payment_schema, ticket_schema, notification_schema, public;
+
 -- =============================================================================
 -- 1. AUTH SERVICE SCHEMA & TABLES
 -- =============================================================================
