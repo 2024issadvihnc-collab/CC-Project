@@ -1,64 +1,54 @@
-version: "3.8"
-
 services:
-  # ===========================================================================
-  # Database & Caching Infrastructure (Internal Only - No Public Host Ports)
-  # ===========================================================================
   postgres:
     image: postgres:15-alpine
     container_name: showtime-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-showtime_local_db_pass_2026}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-showtime_db}
-    # No public host ports published. Accessible only within showtime-net by container name
     expose:
       - "5432"
     volumes:
       - showtime_pgdata:/var/lib/postgresql/data
       - ./infrastructure/database/init-multi-db.sql:/docker-entrypoint-initdb.d/init-multi-db.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-showtime_db}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-showtime_db}" ]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - showtime-net
+      - showtime-backend-net
 
   redis:
     image: redis:7-alpine
     container_name: showtime-redis
     restart: unless-stopped
-    # No public host ports published. Accessible only within showtime-net by container name
     expose:
       - "6379"
     volumes:
       - showtime_redisdata:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - showtime-net
+      - showtime-backend-net
 
-  # ===========================================================================
-  # Internal Microservices (Internal Only - No Public Host Ports)
-  # ===========================================================================
   auth-service:
     build:
-      context: ./services/auth-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/auth-service/Dockerfile
     container_name: showtime-auth-service
     restart: unless-stopped
     environment:
       PORT: 5001
       NODE_ENV: ${NODE_ENV:-production}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-showtime_local_db_pass_2026}@postgres:5432/${POSTGRES_DB:-showtime_db}?search_path=auth_schema
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-showtime_db}?search_path=auth_schema
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET:-showtime_super_secret_jwt_key_development_2026_xyz}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173,http://localhost:5000,http://localhost:3000,http://localhost:80}
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     expose:
       - "5001"
     depends_on:
@@ -67,21 +57,21 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - showtime-net
+      - showtime-backend-net
 
   event-service:
     build:
-      context: ./services/event-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/event-service/Dockerfile
     container_name: showtime-event-service
     restart: unless-stopped
     environment:
       PORT: 5002
       NODE_ENV: ${NODE_ENV:-production}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-showtime_local_db_pass_2026}@postgres:5432/${POSTGRES_DB:-showtime_db}?search_path=event_schema
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-showtime_db}?search_path=event_schema
       REDIS_URL: redis://redis:6379
       BOOKING_SERVICE_URL: http://booking-service:5003
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173,http://localhost:5000,http://localhost:3000,http://localhost:80}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     expose:
       - "5002"
     depends_on:
@@ -90,25 +80,25 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - showtime-net
+      - showtime-backend-net
 
   booking-service:
     build:
-      context: ./services/booking-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/booking-service/Dockerfile
     container_name: showtime-booking-service
     restart: unless-stopped
     environment:
       PORT: 5003
       NODE_ENV: ${NODE_ENV:-production}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-showtime_local_db_pass_2026}@postgres:5432/${POSTGRES_DB:-showtime_db}?search_path=booking_schema
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-showtime_db}?search_path=booking_schema
       REDIS_URL: redis://redis:6379
       PAYMENT_SERVICE_URL: http://payment-service:5004
       TICKET_SERVICE_URL: http://ticket-service:5005
       EVENT_SERVICE_URL: http://event-service:5002
       AUTH_SERVICE_URL: http://auth-service:5001
-      JWT_SECRET: ${JWT_SECRET:-showtime_super_secret_jwt_key_development_2026_xyz}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173,http://localhost:5000,http://localhost:3000,http://localhost:80}
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     expose:
       - "5003"
     depends_on:
@@ -121,61 +111,58 @@ services:
       ticket-service:
         condition: service_started
     networks:
-      - showtime-net
+      - showtime-backend-net
 
   payment-service:
     build:
-      context: ./services/payment-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/payment-service/Dockerfile
     container_name: showtime-payment-service
     restart: unless-stopped
     environment:
       PORT: 5004
       NODE_ENV: ${NODE_ENV:-production}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-showtime_local_db_pass_2026}@postgres:5432/${POSTGRES_DB:-showtime_db}?search_path=payment_schema
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173,http://localhost:5000,http://localhost:3000,http://localhost:80}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-showtime_db}?search_path=payment_schema
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     expose:
       - "5004"
     depends_on:
       postgres:
         condition: service_healthy
     networks:
-      - showtime-net
+      - showtime-backend-net
 
   ticket-service:
     build:
-      context: ./services/ticket-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/ticket-service/Dockerfile
     container_name: showtime-ticket-service
     restart: unless-stopped
     environment:
       PORT: 5005
       NODE_ENV: ${NODE_ENV:-production}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-showtime_local_db_pass_2026}@postgres:5432/${POSTGRES_DB:-showtime_db}?search_path=ticket_schema
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173,http://localhost:5000,http://localhost:3000,http://localhost:80}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-showtime_db}?search_path=ticket_schema
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     expose:
       - "5005"
     depends_on:
       postgres:
         condition: service_healthy
     networks:
-      - showtime-net
+      - showtime-backend-net
 
-  # ===========================================================================
-  # Central API Gateway (The ONLY public entry point for backend services)
-  # ===========================================================================
   api-gateway:
     build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: api-gateway/Dockerfile
     container_name: showtime-api-gateway
     restart: unless-stopped
     environment:
       PORT: 5000
       NODE_ENV: ${NODE_ENV:-production}
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET:-showtime_super_secret_jwt_key_development_2026_xyz}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173,http://localhost:3000,http://localhost:80}
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
       AUTH_SERVICE_URL: http://auth-service:5001
       EVENT_SERVICE_URL: http://event-service:5002
       BOOKING_SERVICE_URL: http://booking-service:5003
@@ -184,7 +171,7 @@ services:
     ports:
       - "5000:5000"
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/api/health"]
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:5000/api/health" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -202,37 +189,12 @@ services:
       ticket-service:
         condition: service_started
     networks:
-      - showtime-net
-
-  # ===========================================================================
-  # Frontend Web App (Nginx production container - Port 80)
-  # ===========================================================================
-  frontend:
-    build:
-      context: ./frontend/showtime
-      dockerfile: Dockerfile
-      args:
-        VITE_API_BASE_URL: /api
-    container_name: showtime-frontend
-    restart: unless-stopped
-    environment:
-      BACKEND_API_URL: ${BACKEND_API_URL:-http://api-gateway:5000}
-    ports:
-      - "80:80"
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    depends_on:
-      - api-gateway
-    networks:
-      - showtime-net
+      - showtime-backend-net
 
 volumes:
   showtime_pgdata:
   showtime_redisdata:
 
 networks:
-  showtime-net:
+  showtime-backend-net:
     driver: bridge

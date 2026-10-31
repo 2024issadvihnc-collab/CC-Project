@@ -49,8 +49,8 @@ services:
   # Internal Microservices (No Host Ports Exposed)
   auth-service:
     build:
-      context: ./services/auth-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/auth-service/Dockerfile
     container_name: showtime-auth-service
     restart: unless-stopped
     environment:
@@ -72,8 +72,8 @@ services:
 
   event-service:
     build:
-      context: ./services/event-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/event-service/Dockerfile
     container_name: showtime-event-service
     restart: unless-stopped
     environment:
@@ -95,8 +95,8 @@ services:
 
   booking-service:
     build:
-      context: ./services/booking-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/booking-service/Dockerfile
     container_name: showtime-booking-service
     restart: unless-stopped
     environment:
@@ -126,8 +126,8 @@ services:
 
   payment-service:
     build:
-      context: ./services/payment-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/payment-service/Dockerfile
     container_name: showtime-payment-service
     restart: unless-stopped
     environment:
@@ -145,8 +145,8 @@ services:
 
   ticket-service:
     build:
-      context: ./services/ticket-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/ticket-service/Dockerfile
     container_name: showtime-ticket-service
     restart: unless-stopped
     environment:
@@ -165,8 +165,8 @@ services:
   # API Gateway (The ONLY container exposing a port on the Backend EC2 host)
   api-gateway:
     build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: api-gateway/Dockerfile
     container_name: showtime-api-gateway
     restart: unless-stopped
     environment:
