@@ -20,7 +20,7 @@ try {
     max: 5,
     idleTimeoutMillis: 10000,
     connectionTimeoutMillis: 2000,
-    ssl: process.env.NODE_ENV === "production" && !dbUrl.includes("localhost") ? { rejectUnauthorized: false } : false,
+    ssl: (process.env.DATABASE_SSL === "true" || dbUrl.includes("rds.amazonaws.com")) ? { rejectUnauthorized: false } : false,
   });
 
   pool.query("SELECT 1")

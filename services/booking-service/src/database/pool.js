@@ -12,7 +12,7 @@ try {
     max: 15,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 3000,
-    ssl: config.nodeEnv === "production" ? { rejectUnauthorized: false } : false,
+    ssl: (process.env.DATABASE_SSL === "true" || (config.databaseUrl && config.databaseUrl.includes("sslmode=require"))) ? { rejectUnauthorized: false } : false,
   });
 
   pool.on("error", (err) => {
