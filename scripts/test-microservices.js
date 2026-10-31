@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.join(__dirname, "..");
 
-const GATEWAY_URL = "http://localhost:5000";
+const GATEWAY_URL = process.env.GATEWAY_URL || "http://localhost:5000";
 
 let passedCount = 0;
 let failedCount = 0;
