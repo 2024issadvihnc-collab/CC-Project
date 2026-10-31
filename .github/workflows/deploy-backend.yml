@@ -21,7 +21,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_BACKEND_OIDC_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION || 'ap-south-1' }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-2' }}
           role-session-name: GitHubActions-DeployBackend
 
       - name: Deploy Backend Services

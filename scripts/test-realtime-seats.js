@@ -7,7 +7,7 @@
 
 import { io } from "socket.io-client";
 
-const SOCKET_URL = "http://localhost:5000";
+const SOCKET_URL = process.env.GATEWAY_URL || "http://localhost:5000";
 const EVENT_ID = "e001";
 
 let passed = 0;
