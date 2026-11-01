@@ -87,8 +87,20 @@ export default function SeatsPage({ user, setShowLogin }) {
   const socketRef = useRef(null);
 
   const category = (event?.category || "").toLowerCase();
+  const eventTitle = (event?.title || "").toLowerCase();
   const isConcert = category === "music" || category === "festival" || category === "dj";
-  const isCricket = category === "cricket" || category === "sports";
+  const isCricket =
+    !isConcert &&
+    (category === "cricket" ||
+      category === "sports" ||
+      eventTitle.includes("cricket") ||
+      eventTitle.includes("ipl") ||
+      eventTitle.includes("t20") ||
+      eventTitle.includes("match") ||
+      eventTitle.includes("stadium") ||
+      eventTitle.includes("vs"));
+
+  const numPrice = typeof event?.price === "number" ? event.price : parseFloat(event?.price) || 500;
 
   const fetchSeats = () => {
     getEventSeats(id).then((seatData) => {
@@ -158,38 +170,83 @@ export default function SeatsPage({ user, setShowLogin }) {
   const soldSeats = useMemo(() => {
     const set = new Set();
     if (apiSoldSeats) {
-      apiSoldSeats.forEach((s) => set.add(s));
+      apiSoldSeats.forEach((s) => {
+        if (!s) return;
+        const str = String(s);
+        set.add(str);
+        if (str.includes(":")) set.add(str.split(":")[1]);
+        if (str.includes("-")) set.add(str.split("-")[1]);
+      });
     }
     if (!event) return set;
-    const filled = event.filledPct || 0.6;
+
+    const eventId = String(event.id || "e001");
+
+    // Deterministic pseudo-random float between 0.00 and 0.99
+    const getSeatHash = (key) => {
+      let h = 0;
+      for (let i = 0; i < key.length; i++) {
+        h = ((h << 5) - h) + key.charCodeAt(i);
+        h |= 0;
+      }
+      return (Math.abs(h) % 100) / 100;
+    };
 
     if (isCricket) {
+      // In cricket stadium, scatter ~18% occupied seats so ~82% are available in every stand
       CRICKET_STANDS.forEach((stand) => {
         stand.rows.forEach((r) => {
           for (let c = 1; c <= stand.cols; c++) {
-            const hash = ((r.charCodeAt(0) * 31 + c * 17 + event.price) % 100) / 100;
-            if (hash < filled) {
-              set.add(`${stand.id}:${r}${c}`);
-              set.add(`${r}${c}`);
+            const seatId = `${r}${c}`;
+            const standKey = `${stand.id}:${seatId}`;
+            const standPrefixed = `${stand.name}-${seatId}`;
+            const hash = getSeatHash(`${eventId}_cricket_${stand.id}_${r}_${c}`);
+            if (hash < 0.18) {
+              set.add(standKey);
+              set.add(standPrefixed);
             }
           }
         });
       });
     } else if (!isConcert) {
+      // In cinema/theatre/comedy, scatter ~22% occupied seats so ~78% are open
       CINEMA_TIERS.forEach((tier) => {
         tier.rows.forEach((r) => {
           for (let c = 1; c <= tier.cols; c++) {
-            const hash = ((r.charCodeAt(0) * 31 + c * 17 + event.price) % 100) / 100;
-            if (hash < filled) {
-              set.add(`${tier.id}:${r}${c}`);
-              set.add(`${r}${c}`);
+            const seatId = `${r}${c}`;
+            const tierKey = `${tier.id}:${seatId}`;
+            const hash = getSeatHash(`${eventId}_cinema_${tier.id}_${r}_${c}`);
+            if (hash < 0.22) {
+              set.add(tierKey);
+              set.add(seatId);
             }
           }
         });
       });
     }
     return set;
-  }, [event?.id, event?.filledPct, apiSoldSeats, isCricket, isConcert]);
+  }, [event?.id, apiSoldSeats, isCricket, isConcert]);
+
+  // Available seats per stand
+  const standStats = useMemo(() => {
+    if (!isCricket) return {};
+    const stats = {};
+    CRICKET_STANDS.forEach((stand) => {
+      let total = stand.rows.length * stand.cols;
+      let available = 0;
+      stand.rows.forEach((r) => {
+        for (let c = 1; c <= stand.cols; c++) {
+          const seatId = `${r}${c}`;
+          const key = `${stand.id}:${seatId}`;
+          const standPrefixed = `${stand.name}-${seatId}`;
+          const isSold = soldSeats.has(key) || soldSeats.has(standPrefixed);
+          if (!isSold) available++;
+        }
+      });
+      stats[stand.id] = { total, available };
+    });
+    return stats;
+  }, [isCricket, soldSeats]);
 
   if (!event) {
     return (
@@ -212,7 +269,11 @@ export default function SeatsPage({ user, setShowLogin }) {
 
   const toggleSeat = (tierOrStand, seatId) => {
     const key = `${tierOrStand.id}:${seatId}`;
-    const isSold = soldSeats.has(key) || soldSeats.has(seatId);
+    const standPrefixed = `${tierOrStand.name}-${seatId}`;
+    const isSold =
+      soldSeats.has(key) ||
+      soldSeats.has(standPrefixed) ||
+      (!isCricket && soldSeats.has(seatId));
     if (isSold) return;
 
     if (selected.includes(key)) {
@@ -248,7 +309,7 @@ export default function SeatsPage({ user, setShowLogin }) {
     CONCERT_PASSES.forEach((p) => {
       const cnt = passCounts[p.id] || 0;
       if (cnt > 0) {
-        const pPrice = Math.round(event.price * p.mult);
+        const pPrice = Math.round(numPrice * p.mult);
         totalPrice += pPrice * cnt;
         totalCount += cnt;
         selectedBreakdown.push({
@@ -265,14 +326,14 @@ export default function SeatsPage({ user, setShowLogin }) {
     totalPrice = selected.reduce((sum, key) => {
       const [standId] = key.split(":");
       const stand = CRICKET_STANDS.find((s) => s.id === standId);
-      return sum + Math.round(event.price * (stand?.mult || 1));
+      return sum + Math.round(numPrice * (stand?.mult || 1));
     }, 0);
   } else {
     totalCount = selected.length;
     totalPrice = selected.reduce((sum, key) => {
       const [tierId] = key.split(":");
       const tier = CINEMA_TIERS.find((t) => t.id === tierId);
-      return sum + Math.round(event.price * (tier?.mult || 1));
+      return sum + Math.round(numPrice * (tier?.mult || 1));
     }, 0);
   }
 
@@ -293,7 +354,7 @@ export default function SeatsPage({ user, setShowLogin }) {
             seatId: passId,
             tierLabel: p.name,
             tierName: p.name,
-            price: Math.round(event.price * p.mult),
+            price: Math.round(numPrice * p.mult),
           });
         }
       });
@@ -305,7 +366,7 @@ export default function SeatsPage({ user, setShowLogin }) {
           seatId: `${stand?.name || "Stand"}-${seatId}`,
           tierLabel: stand?.name || "Stadium Seat",
           tierName: stand?.name || "Stadium Seat",
-          price: Math.round(event.price * (stand?.mult || 1)),
+          price: Math.round(numPrice * (stand?.mult || 1)),
         };
       });
     } else {
@@ -316,7 +377,7 @@ export default function SeatsPage({ user, setShowLogin }) {
           seatId,
           tierLabel: tier?.name || "Standard",
           tierName: tier?.name || "Standard",
-          price: Math.round(event.price * (tier?.mult || 1)),
+          price: Math.round(numPrice * (tier?.mult || 1)),
         };
       });
     }
@@ -666,14 +727,20 @@ export default function SeatsPage({ user, setShowLogin }) {
         <div style={{ maxWidth: 960, margin: "20px auto 100px", padding: "0 16px" }}>
           {/* Stand selector tabs */}
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#71717a", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8 }}>
-              Select Stand / Enclosure
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: "#71717a", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Select Stand / Enclosure
+              </span>
+              <span style={{ fontSize: 11, color: "#16a34a", fontWeight: 600 }}>
+                {standStats[activeStand.id]?.available || 0} seats available in {activeStand.name}
+              </span>
             </div>
 
             <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6 }}>
               {CRICKET_STANDS.map((s) => {
                 const active = activeStandId === s.id;
-                const price = Math.round(event.price * s.mult);
+                const price = Math.round(numPrice * s.mult);
+                const avail = standStats[s.id]?.available ?? 0;
 
                 return (
                   <button
@@ -689,6 +756,7 @@ export default function SeatsPage({ user, setShowLogin }) {
                       whiteSpace: "nowrap",
                       boxShadow: active ? "0 2px 8px rgba(248, 68, 100, 0.15)" : "none",
                       transition: "all 0.15s ease",
+                      position: "relative",
                     }}
                   >
                     <div style={{ fontWeight: 700, fontSize: 13, color: active ? "var(--red, #f84464)" : "var(--ink)" }}>
@@ -696,6 +764,9 @@ export default function SeatsPage({ user, setShowLogin }) {
                     </div>
                     <div style={{ fontSize: 11, color: "#71717a", marginTop: 2 }}>
                       ₹{price.toLocaleString()} · {s.tag}
+                    </div>
+                    <div style={{ fontSize: 10, color: avail > 0 ? "#16a34a" : "#dc2626", fontWeight: 700, marginTop: 3 }}>
+                      {avail > 0 ? `${avail} open` : "Filling fast"}
                     </div>
                   </button>
                 );
@@ -708,7 +779,10 @@ export default function SeatsPage({ user, setShowLogin }) {
             <div className="seat-map">
               <div className="tier">
                 <div className="tier-name" style={{ textAlign: "center", borderBottom: "1px solid #f4f4f5", paddingBottom: 10, marginBottom: 18 }}>
-                  <strong style={{ color: "var(--ink)" }}>{activeStand.name}</strong> — ₹{Math.round(event.price * activeStand.mult).toLocaleString()}
+                  <strong style={{ color: "var(--ink)", fontSize: 14 }}>{activeStand.name}</strong> — ₹{Math.round(numPrice * activeStand.mult).toLocaleString()} per seat
+                  <div style={{ fontSize: 11, color: "#71717a", marginTop: 2 }}>
+                    {activeStand.tag} · {standStats[activeStand.id]?.available || 0} seats open for booking
+                  </div>
                 </div>
 
                 {activeStand.rows.map((rowLetter) => (
@@ -718,7 +792,8 @@ export default function SeatsPage({ user, setShowLogin }) {
                       const seatNum = ci + 1;
                       const seatId = `${rowLetter}${seatNum}`;
                       const key = `${activeStand.id}:${seatId}`;
-                      const isSold = soldSeats.has(key) || soldSeats.has(seatId);
+                      const standPrefixed = `${activeStand.name}-${seatId}`;
+                      const isSold = soldSeats.has(key) || soldSeats.has(standPrefixed);
                       const isSel = selected.includes(key);
 
                       let seatClass = "seat";
@@ -738,12 +813,13 @@ export default function SeatsPage({ user, setShowLogin }) {
                             onMouseEnter={() =>
                               setHoverTip({
                                 id: seatId,
-                                price: event.price * activeStand.mult,
+                                price: numPrice * activeStand.mult,
                                 isSold,
                               })
                             }
                             onMouseLeave={() => setHoverTip(null)}
                             id={`seat-${seatId}`}
+                            title={isSold ? `Seat ${rowLetter}${seatNum} (Sold Out)` : `Seat ${rowLetter}${seatNum} (₹${Math.round(numPrice * activeStand.mult)})`}
                           >
                             {seatNum}
                           </button>
@@ -751,8 +827,8 @@ export default function SeatsPage({ user, setShowLogin }) {
                           {hoverTip?.id === seatId && (
                             <em className="seat-tip">
                               {isSold
-                                ? `${seatId} · Sold Out`
-                                : `${seatId} · ₹${Math.round(hoverTip.price).toLocaleString()}`}
+                                ? `${rowLetter}${seatNum} · Sold Out`
+                                : `${rowLetter}${seatNum} · ₹${Math.round(hoverTip.price).toLocaleString()}`}
                             </em>
                           )}
                         </span>
@@ -763,8 +839,24 @@ export default function SeatsPage({ user, setShowLogin }) {
               </div>
 
               {/* Pitch Orientation Guide */}
-              <div style={{ textAlign: "center", margin: "24px auto 8px", color: "#a1a1aa", fontSize: 11, letterSpacing: "1px", textTransform: "uppercase" }}>
-                Ground & 22-Yard Pitch This Way
+              <div style={{ textAlign: "center", margin: "24px auto 8px" }}>
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 10,
+                    background: "#f0fdf4",
+                    border: "1px solid #bbf7d0",
+                    padding: "7px 18px",
+                    borderRadius: 20,
+                  }}
+                >
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a" }} />
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#166534", letterSpacing: "1px", textTransform: "uppercase" }}>
+                    Ground & 22-Yard Cricket Pitch Facing This Direction
+                  </span>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a" }} />
+                </div>
               </div>
 
               <div className="seat-legend" style={{ marginTop: 14 }}>
@@ -792,7 +884,7 @@ export default function SeatsPage({ user, setShowLogin }) {
             {CINEMA_TIERS.map((tier) => (
               <div className="tier" key={tier.id}>
                 <div className="tier-name">
-                  ₹{Math.round(event.price * tier.mult).toLocaleString()} {tier.name}
+                  ₹{Math.round(numPrice * tier.mult).toLocaleString()} {tier.name}
                 </div>
 
                 {tier.rows.map((rowLetter) => (
@@ -822,12 +914,13 @@ export default function SeatsPage({ user, setShowLogin }) {
                             onMouseEnter={() =>
                               setHoverTip({
                                 id: seatId,
-                                price: event.price * tier.mult,
+                                price: numPrice * tier.mult,
                                 isSold,
                               })
                             }
                             onMouseLeave={() => setHoverTip(null)}
                             id={`seat-${seatId}`}
+                            title={isSold ? `Seat ${rowLetter}${seatNum} (Sold Out)` : `Seat ${rowLetter}${seatNum} (₹${Math.round(numPrice * tier.mult)})`}
                           >
                             {seatNum}
                           </button>

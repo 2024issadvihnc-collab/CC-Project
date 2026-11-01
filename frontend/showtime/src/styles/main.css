@@ -279,7 +279,7 @@ hr{border:0;border-top:1px solid var(--line);margin:32px 0}
 .seat:hover:not(:disabled){background:currentColor;color:#fff}
 .seat.sel{background:var(--green)!important;color:#fff!important;border-color:var(--green)!important;box-shadow:0 0 14px #2ecc7188}
 .seat.held{background:#fef3c7!important;border-color:#f59e0b!important;color:#b45309!important;cursor:not-allowed!important;box-shadow:0 0 8px rgba(245,158,11,0.35)}
-.seat.sold{background:#ececf0;border-color:#ececf0;color:#ececf0;cursor:not-allowed}
+.seat.sold{background:#f1f2f6;border-color:#e4e6ed;color:#a0a4b0;cursor:not-allowed;opacity:0.8}
 .seat-tip{position:absolute;bottom:130%;left:50%;transform:translate(-50%);background:#111;color:#fff;font-style:normal;font-size:11px;padding:3px 8px;border-radius:5px;white-space:nowrap;z-index:5;pointer-events:none}
 .screen-wrap{margin:30px auto 8px;width:min(520px,90vw);text-align:center}
 .screen-wrap svg{width:100%;height:56px}
