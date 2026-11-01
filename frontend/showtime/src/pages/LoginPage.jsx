@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import {
   registerUser,
   loginUser,
-  googleLogin,
   sendOtp as apiSendOtp,
   verifyOtp as apiVerifyOtp,
   resetPassword,
@@ -22,10 +21,6 @@ export default function LoginPage({ onLoginSuccess }) {
   // Mode: "login" | "register" | "forgot"
   const [mode, setMode] = useState("login");
   const [loginMethod, setLoginMethod] = useState("password"); // "password" | "otp"
-
-  // Google Login state
-  const [showGoogleModal, setShowGoogleModal] = useState(false);
-  const [googleEmail, setGoogleEmail] = useState("");
 
   // Registration fields
   const [regName, setRegName] = useState("");
@@ -52,31 +47,6 @@ export default function LoginPage({ onLoginSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-
-  // Handle Google / Gmail Sign-in
-  const handleGoogleSignIn = async (emailToUse, nameToUse) => {
-    const targetEmail = (emailToUse || googleEmail || "").trim();
-    if (!targetEmail || !targetEmail.includes("@")) {
-      setError("Please enter a valid Gmail address (e.g. name@gmail.com)");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    try {
-      const res = await googleLogin({
-        email: targetEmail,
-        name: nameToUse || targetEmail.split("@")[0],
-      });
-      const userData = { ...res.user, token: res.token || res.user?.token };
-      localStorage.setItem("showtime_user", JSON.stringify(userData));
-      if (onLoginSuccess) onLoginSuccess(userData);
-      navigate(from, { replace: true });
-    } catch (err) {
-      setError(err.message || "Google sign-in failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Handle Registration
   const handleRegister = async (e) => {
@@ -148,7 +118,7 @@ export default function LoginPage({ onLoginSuccess }) {
       if (onLoginSuccess) onLoginSuccess(userData);
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.message || "Login failed. If using Gmail, click 'Continue with Google'.");
+      setError(err.message || "Login failed. Please check credentials or register.");
     } finally {
       setLoading(false);
     }
@@ -186,7 +156,7 @@ export default function LoginPage({ onLoginSuccess }) {
   const handleSendOtp = async () => {
     const target = otpPhone.trim();
     if (target.includes("@") ? target.length < 5 : target.length < 10) {
-      setError("Please enter a valid 10-digit mobile number or Gmail ID");
+      setError("Please enter a valid 10-digit mobile number or Email ID");
       return;
     }
     setError("");
@@ -277,129 +247,6 @@ export default function LoginPage({ onLoginSuccess }) {
               : "Sign in to access your booked passes and reservations"}
           </p>
 
-          {/* ── GOOGLE / GMAIL 1-CLICK SIGN-IN BUTTON ── */}
-          {mode !== "forgot" && !showGoogleModal && (
-            <div>
-              <button
-                type="button"
-                onClick={() => setShowGoogleModal(true)}
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 12,
-                  padding: "11px 16px",
-                  background: "#ffffff",
-                  border: "1px solid #dadce0",
-                  borderRadius: 8,
-                  color: "#3c4043",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  boxShadow: "0 1px 3px rgba(60,64,67,0.08)",
-                  transition: "all 0.2s ease",
-                  marginBottom: 14,
-                }}
-                id="page-google-signin-btn"
-              >
-                <svg width="18" height="18" viewBox="0 0 48 48">
-                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
-                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
-                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
-                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
-                </svg>
-                Continue with Google / Gmail
-              </button>
-
-              <div style={{ display: "flex", alignItems: "center", margin: "14px 0 18px", gap: 10 }}>
-                <div style={{ flex: 1, height: 1, background: "var(--line)" }} />
-                <span style={{ fontSize: 12, color: "var(--mut)", textTransform: "uppercase", letterSpacing: 0.5 }}>or sign in with password</span>
-                <div style={{ flex: 1, height: 1, background: "var(--line)" }} />
-              </div>
-            </div>
-          )}
-
-          {/* ── GOOGLE SIGN-IN INTERACTIVE PROMPT ── */}
-          {showGoogleModal && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{
-                background: "#f8fafd",
-                border: "1px solid #d2e3fc",
-                borderRadius: 10,
-                padding: 16,
-                marginBottom: 18,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <svg width="20" height="20" viewBox="0 0 48 48">
-                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
-                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
-                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
-                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
-                  </svg>
-                  <strong style={{ fontSize: 14, color: "#1a73e8" }}>Sign in with Google</strong>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowGoogleModal(false)}
-                  style={{ background: "none", border: "none", fontSize: 12, color: "var(--mut)", cursor: "pointer" }}
-                >
-                  ✕ Close
-                </button>
-              </div>
-
-              {/* Quick Select: Known User sadvihn@gmail.com */}
-              <button
-                type="button"
-                onClick={() => handleGoogleSignIn("sadvihn@gmail.com", "Sadvi")}
-                disabled={loading}
-                style={{
-                  width: "100%",
-                  textAlign: "left",
-                  padding: "10px 14px",
-                  background: "#ffffff",
-                  border: "1px solid #c2e7ff",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: 10,
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: "var(--ink2)" }}>Sadvi</div>
-                  <div style={{ fontSize: 12, color: "var(--mut)" }}>sadvihn@gmail.com</div>
-                </div>
-                <span style={{ fontSize: 12, color: "#1a73e8", fontWeight: 600 }}>1-Click Login →</span>
-              </button>
-
-              {/* Or enter any other Gmail account */}
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  style={{ flex: 1, padding: "8px 12px", border: "1px solid var(--line)", borderRadius: 6, fontSize: 13 }}
-                  type="email"
-                  placeholder="Or enter yourname@gmail.com"
-                  value={googleEmail}
-                  onChange={(e) => setGoogleEmail(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="btn-primary"
-                  onClick={() => handleGoogleSignIn(googleEmail)}
-                  disabled={loading || !googleEmail.includes("@")}
-                  style={{ padding: "8px 14px", fontSize: 13 }}
-                >
-                  {loading ? "Signing In…" : "Sign In"}
-                </button>
-              </div>
-            </motion.div>
-          )}
-
           {/* Toggle Tabs (when not resetting password) */}
           {mode !== "forgot" && (
             <div
@@ -414,7 +261,7 @@ export default function LoginPage({ onLoginSuccess }) {
             >
               <button
                 type="button"
-                onClick={() => { setMode("login"); setError(""); setSuccessMsg(""); setShowGoogleModal(false); }}
+                onClick={() => { setMode("login"); setError(""); setSuccessMsg(""); }}
                 style={{
                   padding: "8px 0",
                   borderRadius: 8,
@@ -432,7 +279,7 @@ export default function LoginPage({ onLoginSuccess }) {
               </button>
               <button
                 type="button"
-                onClick={() => { setMode("register"); setError(""); setSuccessMsg(""); setShowGoogleModal(false); }}
+                onClick={() => { setMode("register"); setError(""); setSuccessMsg(""); }}
                 style={{
                   padding: "8px 0",
                   borderRadius: 8,
@@ -497,7 +344,7 @@ export default function LoginPage({ onLoginSuccess }) {
                 <input
                   style={{ width: "100%", padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 14 }}
                   type="email"
-                  placeholder="Email ID / Gmail ID"
+                  placeholder="Email ID (e.g. name@mail.com)"
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
                   required
@@ -593,7 +440,7 @@ export default function LoginPage({ onLoginSuccess }) {
                   <div>
                     <input
                       style={{ width: "100%", padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 14 }}
-                      placeholder="Phone Number or Gmail / Email ID"
+                      placeholder="Phone Number or Email ID"
                       value={loginIdentifier}
                       onChange={(e) => setLoginIdentifier(e.target.value)}
                       required
@@ -661,7 +508,7 @@ export default function LoginPage({ onLoginSuccess }) {
                       <div className="phone-in">
                         <input
                           type="text"
-                          placeholder="Enter 10-digit mobile or Gmail ID"
+                          placeholder="Enter 10-digit mobile or Email ID"
                           value={otpPhone}
                           onChange={(e) => setOtpPhone(e.target.value)}
                           onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}

@@ -391,14 +391,34 @@ export default function Navbar({ city, setCity, user, setShowLogin, onSignOut, o
             )}
 
             {user ? (
-              <div className="user" ref={userMenuRef}>
+              <div className="user" ref={userMenuRef} style={{ display: "flex", alignItems: "center" }}>
                 <button
-                  className="avatar"
+                  className="user-nav-chip"
                   onClick={() => setShowUser(!showUser)}
                   id="nav-user-btn"
                   title="Profile & Settings"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    background: "rgba(255, 255, 255, 0.12)",
+                    border: "1px solid rgba(255, 255, 255, 0.22)",
+                    borderRadius: 24,
+                    padding: "4px 14px 4px 5px",
+                    cursor: "pointer",
+                    color: "#ffffff",
+                    transition: "all 0.2s ease",
+                  }}
                 >
-                  {userInitial}
+                  <span className="avatar" style={{ margin: 0, width: 28, height: 28, fontSize: 13, background: "var(--red, #f84464)", color: "#fff", display: "grid", placeItems: "center", borderRadius: "50%", fontWeight: 700 }}>
+                    {userInitial}
+                  </span>
+                  <span style={{ fontWeight: 700, fontSize: 13, color: "#ffffff", maxWidth: 130, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {user.name || "ShowTime User"}
+                  </span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ opacity: 0.8, marginLeft: 2 }}>
+                    <path d="M7 10l5 5 5-5z" />
+                  </svg>
                 </button>
                 <AnimatePresence>
                   {showUser && (
