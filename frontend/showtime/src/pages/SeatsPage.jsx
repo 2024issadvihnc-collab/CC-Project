@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { getEventById as localGetEventById } from "../data/events";
 import { getEventById as apiGetEventById, getEventSeats } from "../services/api";
+import { EventPoster } from "../components/EventCard";
 
 // ── CINEMA / MOVIE TIERS ──
 const CINEMA_TIERS = [
@@ -13,19 +14,55 @@ const CINEMA_TIERS = [
 
 // ── CRICKET STADIUM STANDS ──
 const CRICKET_STANDS = [
-  { id: "north", name: "North Stand", mult: 2.0, rows: ["A", "B", "C"], cols: 16, aisles: [4, 11] },
-  { id: "pavilion", name: "Pavilion VIP", mult: 3.5, rows: ["A", "B"], cols: 14, aisles: [4, 9] },
-  { id: "east", name: "East Stand", mult: 1.5, rows: ["A", "B", "C"], cols: 16, aisles: [4, 11] },
-  { id: "west", name: "West Stand", mult: 1.2, rows: ["A", "B", "C"], cols: 16, aisles: [4, 11] },
-  { id: "south", name: "South Stand", mult: 1.0, rows: ["A", "B", "C", "D"], cols: 18, aisles: [4, 13] },
+  { id: "north", name: "North Stand", tag: "Pitch Straight View", mult: 2.0, rows: ["A", "B", "C"], cols: 16, aisles: [4, 11] },
+  { id: "pavilion", name: "Pavilion VIP Box", tag: "Luxury Lounge & Dining", mult: 3.5, rows: ["A", "B"], cols: 14, aisles: [4, 9] },
+  { id: "east", name: "East Stand", tag: "Covered Upper Tier", mult: 1.5, rows: ["A", "B", "C"], cols: 16, aisles: [4, 11] },
+  { id: "west", name: "West Stand", tag: "Boundary Line Action", mult: 1.2, rows: ["A", "B", "C"], cols: 16, aisles: [4, 11] },
+  { id: "south", name: "South Grandstand", tag: "Panoramic Field View", mult: 1.0, rows: ["A", "B", "C", "D"], cols: 18, aisles: [4, 13] },
 ];
 
-// ── CONCERT / MUSIC PASSES ──
+// ── CONCERT / MUSIC PASSES & ARENA ZONES ──
 const CONCERT_PASSES = [
-  { id: "fan_pit", name: "Fan Pit", sub: "Standing area near stage", mult: 3.5, prefix: "PIT" },
-  { id: "vip_deck", name: "VIP Deck", sub: "Elevated viewing deck", mult: 2.5, prefix: "VIP" },
-  { id: "gold_standing", name: "Gold Zone", sub: "Center arena standing", mult: 1.6, prefix: "GLD" },
-  { id: "silver_ga", name: "General Admission", sub: "Open ground entry", mult: 1.0, prefix: "GA" },
+  {
+    id: "fan_pit",
+    name: "Fan Pit",
+    tag: "Closest to Stage",
+    sub: "Front row standing barrier access directly facing the live performance stage.",
+    perks: ["Front barrier access", "Dedicated queue lane", "Complimentary wristband"],
+    color: "#8b5cf6",
+    mult: 3.5,
+    prefix: "PIT",
+  },
+  {
+    id: "vip_deck",
+    name: "VIP Lounge Deck",
+    tag: "Elevated Viewing",
+    sub: "Elevated platform terrace with unobstructed stage line-of-sight and bar access.",
+    perks: ["Elevated deck view", "Dedicated bar counter", "Fast-track entry"],
+    color: "#f59e0b",
+    mult: 2.5,
+    prefix: "VIP",
+  },
+  {
+    id: "gold_standing",
+    name: "Gold Zone Standing",
+    tag: "Acoustic Sweet Spot",
+    sub: "High-energy center arena floor with prime sound balance and crowd atmosphere.",
+    perks: ["Center floor standing", "Direct stage sightline", "High-power acoustics"],
+    color: "#3b82f6",
+    mult: 1.6,
+    prefix: "GLD",
+  },
+  {
+    id: "silver_ga",
+    name: "General Admission",
+    tag: "Open Ground Lawn",
+    sub: "Open lawn entry with access to festival food village and live LED projection screens.",
+    perks: ["Open ground lawn access", "Food & beverage village access", "Full festival experience"],
+    color: "#10b981",
+    mult: 1.0,
+    prefix: "GA",
+  },
 ];
 
 export default function SeatsPage({ user, setShowLogin }) {
@@ -205,7 +242,7 @@ export default function SeatsPage({ user, setShowLogin }) {
 
   let totalPrice = 0;
   let totalCount = 0;
-  let seatLabels = [];
+  let selectedBreakdown = [];
 
   if (isConcert) {
     CONCERT_PASSES.forEach((p) => {
@@ -214,7 +251,13 @@ export default function SeatsPage({ user, setShowLogin }) {
         const pPrice = Math.round(event.price * p.mult);
         totalPrice += pPrice * cnt;
         totalCount += cnt;
-        seatLabels.push(`${cnt}x ${p.name}`);
+        selectedBreakdown.push({
+          id: p.id,
+          name: p.name,
+          count: cnt,
+          unitPrice: pPrice,
+          total: pPrice * cnt,
+        });
       }
     });
   } else if (isCricket) {
@@ -224,7 +267,6 @@ export default function SeatsPage({ user, setShowLogin }) {
       const stand = CRICKET_STANDS.find((s) => s.id === standId);
       return sum + Math.round(event.price * (stand?.mult || 1));
     }, 0);
-    seatLabels = selected.map((k) => k.split(":")[1]);
   } else {
     totalCount = selected.length;
     totalPrice = selected.reduce((sum, key) => {
@@ -232,7 +274,6 @@ export default function SeatsPage({ user, setShowLogin }) {
       const tier = CINEMA_TIERS.find((t) => t.id === tierId);
       return sum + Math.round(event.price * (tier?.mult || 1));
     }, 0);
-    seatLabels = selected.map((k) => k.split(":")[1]);
   }
 
   const proceed = () => {
@@ -289,15 +330,15 @@ export default function SeatsPage({ user, setShowLogin }) {
 
   return (
     <main className="seat-pg">
-      {/* ── TOP BAR ── */}
+      {/* ── TOP HEADER BAR ── */}
       <section className="seat-top">
         <button className="back" onClick={() => navigate(-1)} aria-label="Go back">
           ‹
         </button>
-        <div>
-          <h2>{event.title}</h2>
-          <p>
-            {event.venue}, {event.city} | {dateStr}, {event.time}
+        <div style={{ flex: 1 }}>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{event.title}</h2>
+          <p style={{ margin: "3px 0 0", fontSize: 12, opacity: 0.85 }}>
+            {event.venue}, {event.city} · {dateStr}, {event.time}
           </p>
         </div>
 
@@ -312,118 +353,362 @@ export default function SeatsPage({ user, setShowLogin }) {
         )}
       </section>
 
-      {/* ── CONCERT TICKETING (Clean list of passes) ── */}
+      {/* =========================================================================
+          1. CONCERT & MUSIC FESTIVAL TICKETING (Aesthetic 2-Column Booking Experience)
+          ========================================================================= */}
       {isConcert && (
-        <div style={{ maxWidth: 640, margin: "24px auto 100px", padding: "0 16px" }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16, color: "var(--ink)" }}>
-            Select Tickets
-          </h3>
+        <div style={{ maxWidth: 1120, margin: "24px auto 90px", padding: "0 20px" }}>
+          {/* Main 2-Column Container */}
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.7fr) minmax(300px, 1fr)", gap: 28, alignItems: "start" }}>
+            
+            {/* Left Column: Venue Layout & Passes */}
+            <div>
+              {/* Venue Arena Layout Guide */}
+              <div
+                style={{
+                  background: "#18181b",
+                  borderRadius: 12,
+                  padding: "20px 24px",
+                  color: "#ffffff",
+                  marginBottom: 24,
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", color: "#a1a1aa" }}>
+                    Stage & Arena Standing Layout
+                  </span>
+                  <span style={{ fontSize: 11, color: "#71717a" }}>
+                    General Admission & Standing Zones
+                  </span>
+                </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {CONCERT_PASSES.map((p) => {
-              const price = Math.round(event.price * p.mult);
-              const count = passCounts[p.id] || 0;
-
-              return (
+                {/* Stage Area */}
                 <div
-                  key={p.id}
                   style={{
-                    background: "#ffffff",
-                    border: count > 0 ? "1.5px solid var(--red, #f84464)" : "1px solid var(--line, #e2e8f0)",
-                    borderRadius: 8,
-                    padding: "16px 20px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
+                    background: "linear-gradient(90deg, #3f3f46 0%, #71717a 50%, #3f3f46 100%)",
+                    borderRadius: 6,
+                    padding: "8px",
+                    textAlign: "center",
+                    fontWeight: 700,
+                    fontSize: 12,
+                    letterSpacing: "1.5px",
+                    color: "#f4f4f5",
+                    marginBottom: 10,
                   }}
                 >
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 15, color: "var(--ink)" }}>{p.name}</div>
-                    <div style={{ fontSize: 12, color: "var(--mut)", marginTop: 2 }}>{p.sub}</div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)", marginTop: 6 }}>
-                      ₹{price.toLocaleString()}
-                    </div>
-                  </div>
+                  STAGE
+                </div>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <button
-                      onClick={() => updatePassCount(p.id, -1)}
-                      disabled={count <= 0}
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 6,
-                        border: "1px solid var(--line, #cbd5e1)",
-                        background: "#fff",
-                        color: count > 0 ? "var(--ink)" : "var(--mut)",
-                        fontSize: 16,
-                        cursor: count > 0 ? "pointer" : "default",
-                      }}
-                    >
-                      −
-                    </button>
-                    <span style={{ minWidth: 20, textAlign: "center", fontWeight: 700, fontSize: 15 }}>
-                      {count}
-                    </span>
-                    <button
-                      onClick={() => updatePassCount(p.id, 1)}
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 6,
-                        border: "1px solid var(--red, #f84464)",
-                        background: "var(--red, #f84464)",
-                        color: "#fff",
-                        fontSize: 16,
-                        cursor: "pointer",
-                      }}
-                    >
-                      +
-                    </button>
+                {/* Standing Zones Layout Diagram */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr 1fr", gap: 8, marginBottom: 8 }}>
+                  <div style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid #f59e0b", borderRadius: 6, padding: "12px 6px", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#fde68a" }}>
+                    VIP Deck (Left)
+                  </div>
+                  <div style={{ background: "rgba(139, 92, 246, 0.2)", border: "1px solid #8b5cf6", borderRadius: 6, padding: "14px 8px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#ddd6fe" }}>
+                    Fan Pit (Front Stage)
+                  </div>
+                  <div style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid #f59e0b", borderRadius: 6, padding: "12px 6px", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#fde68a" }}>
+                    VIP Deck (Right)
                   </div>
                 </div>
-              );
-            })}
+
+                <div style={{ background: "rgba(59, 130, 246, 0.15)", border: "1px solid #3b82f6", borderRadius: 6, padding: "10px", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#bfdbfe", marginBottom: 8 }}>
+                  Gold Zone (Main Arena Floor)
+                </div>
+
+                <div style={{ background: "rgba(16, 185, 129, 0.12)", border: "1px solid #10b981", borderRadius: 6, padding: "10px", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#a7f3d0" }}>
+                  General Admission (Open Lawn)
+                </div>
+              </div>
+
+              {/* Ticket Category Cards */}
+              <div style={{ marginBottom: 12 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", margin: "0 0 14px" }}>
+                  Select Passes
+                </h3>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {CONCERT_PASSES.map((p) => {
+                  const price = Math.round(event.price * p.mult);
+                  const count = passCounts[p.id] || 0;
+
+                  return (
+                    <div
+                      key={p.id}
+                      style={{
+                        background: "#ffffff",
+                        border: count > 0 ? "1.5px solid var(--red, #f84464)" : "1px solid #e4e4e7",
+                        borderRadius: 10,
+                        padding: "18px 20px",
+                        position: "relative",
+                        overflow: "hidden",
+                        boxShadow: count > 0 ? "0 4px 16px rgba(248, 68, 100, 0.12)" : "0 1px 3px rgba(0,0,0,0.04)",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      {/* Left accent bar */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: 0,
+                          top: 0,
+                          bottom: 0,
+                          width: 4,
+                          background: count > 0 ? "var(--red, #f84464)" : p.color,
+                        }}
+                      />
+
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--ink)" }}>
+                              {p.name}
+                            </h4>
+                            <span
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 700,
+                                padding: "2px 7px",
+                                borderRadius: 4,
+                                background: "#f4f4f5",
+                                color: "#52525b",
+                              }}
+                            >
+                              {p.tag}
+                            </span>
+                          </div>
+
+                          <p style={{ margin: "5px 0 0", fontSize: 12.5, color: "#71717a", lineHeight: 1.4 }}>
+                            {p.sub}
+                          </p>
+
+                          {/* Perks */}
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 8 }}>
+                            {p.perks.map((perk, idx) => (
+                              <span key={idx} style={{ fontSize: 11, color: "#52525b", display: "inline-flex", alignItems: "center", gap: 4 }}>
+                                <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#a1a1aa" }} />
+                                {perk}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Price & Stepper */}
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)" }}>
+                            ₹{price.toLocaleString()}
+                          </div>
+                          <div style={{ fontSize: 11, color: "#a1a1aa", marginTop: 1 }}>
+                            per pass
+                          </div>
+
+                          <div
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              background: "#f4f4f5",
+                              borderRadius: 8,
+                              padding: "3px",
+                              marginTop: 10,
+                              border: "1px solid #e4e4e7",
+                            }}
+                          >
+                            <button
+                              onClick={() => updatePassCount(p.id, -1)}
+                              disabled={count <= 0}
+                              style={{
+                                width: 28,
+                                height: 28,
+                                borderRadius: 6,
+                                border: "none",
+                                background: count > 0 ? "#ffffff" : "transparent",
+                                color: count > 0 ? "var(--ink)" : "#a1a1aa",
+                                fontSize: 15,
+                                fontWeight: 700,
+                                cursor: count > 0 ? "pointer" : "default",
+                                boxShadow: count > 0 ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                              }}
+                              aria-label="Decrease quantity"
+                            >
+                              −
+                            </button>
+                            <span style={{ minWidth: 26, textAlign: "center", fontWeight: 700, fontSize: 14 }}>
+                              {count}
+                            </span>
+                            <button
+                              onClick={() => updatePassCount(p.id, 1)}
+                              style={{
+                                width: 28,
+                                height: 28,
+                                borderRadius: 6,
+                                border: "none",
+                                background: "var(--red, #f84464)",
+                                color: "#ffffff",
+                                fontSize: 15,
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                boxShadow: "0 1px 3px rgba(248, 68, 100, 0.3)",
+                              }}
+                              aria-label="Increase quantity"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right Column: Sticky Booking Summary Card */}
+            <div style={{ position: "sticky", top: 80 }}>
+              <div
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #e4e4e7",
+                  borderRadius: 12,
+                  padding: 22,
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+                }}
+              >
+                {/* Event Mini Poster & Info */}
+                <div style={{ display: "flex", gap: 14, paddingBottom: 16, borderBottom: "1px solid #f4f4f5" }}>
+                  <div style={{ width: 64, height: 86, borderRadius: 6, overflow: "hidden", flexShrink: 0 }}>
+                    <EventPoster event={event} />
+                  </div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "var(--ink)", lineHeight: 1.3 }}>
+                      {event.title}
+                    </h4>
+                    <div style={{ fontSize: 12, color: "#71717a", marginTop: 4 }}>
+                      {dateStr} · {event.time}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#71717a" }}>
+                      {event.venue}, {event.city}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Selected Breakdown */}
+                <div style={{ padding: "16px 0", borderBottom: "1px solid #f4f4f5" }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 10 }}>
+                    Selected Passes
+                  </div>
+
+                  {selectedBreakdown.length === 0 ? (
+                    <div style={{ fontSize: 13, color: "#a1a1aa", textAlign: "center", padding: "14px 0" }}>
+                      No passes selected yet.<br />Choose passes to continue.
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {selectedBreakdown.map((item) => (
+                        <div key={item.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                          <span style={{ color: "var(--ink)" }}>
+                            {item.count}x {item.name}
+                          </span>
+                          <span style={{ fontWeight: 600, color: "var(--ink)" }}>
+                            ₹{item.total.toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Price Total */}
+                <div style={{ paddingTop: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 18 }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "#52525b" }}>
+                      Total Amount
+                    </span>
+                    <span style={{ fontSize: 20, fontWeight: 800, color: "var(--red, #f84464)" }}>
+                      ₹{Math.round(totalPrice).toLocaleString()}
+                    </span>
+                  </div>
+
+                  <button
+                    className="btn-primary"
+                    onClick={proceed}
+                    disabled={totalCount === 0}
+                    style={{
+                      width: "100%",
+                      padding: "13px",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      borderRadius: 8,
+                      opacity: totalCount === 0 ? 0.5 : 1,
+                      cursor: totalCount === 0 ? "not-allowed" : "pointer",
+                    }}
+                    id="concert-checkout-btn"
+                  >
+                    {totalCount > 0 ? `Proceed to Checkout (${totalCount} ${totalCount === 1 ? "Pass" : "Passes"})` : "Select Passes to Continue"}
+                  </button>
+
+                  <div style={{ fontSize: 11, color: "#a1a1aa", textAlign: "center", marginTop: 12 }}>
+                    Instant M-Ticket Confirmation · 100% Secure
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       )}
 
-      {/* ── CRICKET STADIUM (Simple stand tabs + clean seat grid) ── */}
+      {/* =========================================================================
+          2. CRICKET STADIUM TICKETING (Stand-by-Stand Stadium View & Seat Grid)
+          ========================================================================= */}
       {isCricket && (
-        <div style={{ maxWidth: 900, margin: "20px auto 100px", padding: "0 16px" }}>
-          {/* Stand selection tabs */}
-          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 10, marginBottom: 20 }}>
-            {CRICKET_STANDS.map((s) => {
-              const active = activeStandId === s.id;
-              const price = Math.round(event.price * s.mult);
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => setActiveStandId(s.id)}
-                  style={{
-                    padding: "8px 16px",
-                    borderRadius: 20,
-                    border: active ? "1.5px solid var(--red, #f84464)" : "1px solid var(--line, #e2e8f0)",
-                    background: active ? "var(--red, #f84464)" : "#fff",
-                    color: active ? "#fff" : "var(--ink)",
-                    cursor: "pointer",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {s.name} · ₹{price.toLocaleString()}
-                </button>
-              );
-            })}
+        <div style={{ maxWidth: 960, margin: "20px auto 100px", padding: "0 16px" }}>
+          {/* Stand selector tabs */}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#71717a", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8 }}>
+              Select Stand / Enclosure
+            </div>
+
+            <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6 }}>
+              {CRICKET_STANDS.map((s) => {
+                const active = activeStandId === s.id;
+                const price = Math.round(event.price * s.mult);
+
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setActiveStandId(s.id)}
+                    style={{
+                      padding: "10px 16px",
+                      borderRadius: 8,
+                      border: active ? "1.5px solid var(--red, #f84464)" : "1px solid #e4e4e7",
+                      background: active ? "#ffffff" : "#f4f4f5",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      whiteSpace: "nowrap",
+                      boxShadow: active ? "0 2px 8px rgba(248, 68, 100, 0.15)" : "none",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, fontSize: 13, color: active ? "var(--red, #f84464)" : "var(--ink)" }}>
+                      {s.name}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#71717a", marginTop: 2 }}>
+                      ₹{price.toLocaleString()} · {s.tag}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Seat Grid */}
-          <div className="seat-scroll">
+          <div className="seat-scroll" style={{ background: "#ffffff", borderRadius: 12, border: "1px solid #e4e4e7", padding: "24px 16px" }}>
             <div className="seat-map">
               <div className="tier">
-                <div className="tier-name">
-                  {activeStand.name} — ₹{Math.round(event.price * activeStand.mult).toLocaleString()}
+                <div className="tier-name" style={{ textAlign: "center", borderBottom: "1px solid #f4f4f5", paddingBottom: 10, marginBottom: 18 }}>
+                  <strong style={{ color: "var(--ink)" }}>{activeStand.name}</strong> — ₹{Math.round(event.price * activeStand.mult).toLocaleString()}
                 </div>
 
                 {activeStand.rows.map((rowLetter) => (
@@ -477,7 +762,12 @@ export default function SeatsPage({ user, setShowLogin }) {
                 ))}
               </div>
 
-              <div className="seat-legend" style={{ marginTop: 24 }}>
+              {/* Pitch Orientation Guide */}
+              <div style={{ textAlign: "center", margin: "24px auto 8px", color: "#a1a1aa", fontSize: 11, letterSpacing: "1px", textTransform: "uppercase" }}>
+                Ground & 22-Yard Pitch This Way
+              </div>
+
+              <div className="seat-legend" style={{ marginTop: 14 }}>
                 <span>
                   <i className="seat" /> Available
                 </span>
@@ -493,7 +783,9 @@ export default function SeatsPage({ user, setShowLogin }) {
         </div>
       )}
 
-      {/* ── CINEMA / THEATRE (Clean standard movie layout) ── */}
+      {/* =========================================================================
+          3. CINEMA & AUDITORIUM SEATING (Screen at Top, Curved Rows)
+          ========================================================================= */}
       {!isConcert && !isCricket && (
         <div className="seat-scroll">
           <div className="seat-map">
@@ -577,13 +869,13 @@ export default function SeatsPage({ user, setShowLogin }) {
         </div>
       )}
 
-      {/* ── SIMPLE FLOATING CHECKOUT BAR ── */}
-      {totalCount > 0 && (
+      {/* ── FLOATING CHECKOUT BAR (For Cricket & Cinema) ── */}
+      {!isConcert && totalCount > 0 && (
         <div className="pay-bar">
           <div>
             <small style={{ color: "var(--ink2)", fontWeight: 700 }}>
-              {totalCount} {totalCount > 1 ? "Tickets" : "Ticket"}: {seatLabels.slice(0, 3).join(", ")}
-              {seatLabels.length > 3 ? ` +${seatLabels.length - 3} more` : ""}
+              {totalCount} {totalCount > 1 ? "Tickets" : "Ticket"}: {selected.map((k) => k.split(":")[1]).slice(0, 3).join(", ")}
+              {selected.length > 3 ? ` +${selected.length - 3} more` : ""}
             </small>
             <div style={{ fontSize: 13, color: "var(--mut)", marginTop: 2 }}>
               Total: <strong style={{ color: "var(--red)", fontSize: 17 }}>₹{Math.round(totalPrice).toLocaleString()}</strong>
