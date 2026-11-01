@@ -384,7 +384,7 @@ export default function PaymentSimulatorModal({
         {/* Security Note Footer */}
         <div style={{ textAlign: "center", marginTop: 14, paddingTop: 10, borderTop: "1px solid var(--line)" }}>
           <small style={{ fontSize: 11, color: "var(--mut)" }}>
-            🔒 256-bit SSL Encrypted Sandbox · ShowTime College Demonstration
+            256-bit SSL Encrypted Sandbox · ShowTime College Demonstration
           </small>
         </div>
       </motion.div>

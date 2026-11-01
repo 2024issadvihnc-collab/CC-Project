@@ -365,8 +365,8 @@ export default function Navbar({ city, setCity, user, setShowLogin, onSignOut, o
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                                <span style={{ fontSize: 16 }}>
-                                  {n.type === "BOOKING_CONFIRMED" ? "🎟️" : n.type === "BOOKING_FAILED" ? "⚠️" : n.type === "CANCELLATION" ? "↩️" : "🔔"}
+                                <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: n.type === "BOOKING_CONFIRMED" ? "#dcfce7" : n.type === "BOOKING_FAILED" ? "#fee2e2" : "#f1f5f9", color: n.type === "BOOKING_CONFIRMED" ? "#166534" : n.type === "BOOKING_FAILED" ? "#991b1b" : "#475569" }}>
+                                  {n.type === "BOOKING_CONFIRMED" ? "OK" : n.type === "BOOKING_FAILED" ? "ALERT" : n.type === "CANCELLATION" ? "REFUND" : "INFO"}
                                 </span>
                                 <div style={{ flex: 1 }}>
                                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>

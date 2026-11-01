@@ -398,7 +398,7 @@ export default function MyTickets({ tickets = [], user, setShowLogin }) {
 
                   {cancelError && (
                     <div style={{ background: "#fee2e2", color: "#991b1b", padding: 10, borderRadius: 6, fontSize: 12, marginBottom: 14 }}>
-                      ⚠️ {cancelError}
+                      {cancelError}
                     </div>
                   )}
 

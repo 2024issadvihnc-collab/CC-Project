@@ -16,7 +16,7 @@ const CINEMA_TIERS = [
 const CRICKET_STANDS = [
   {
     id: "pavilion",
-    name: "🏆 Pavilion End / VIP Hospitality Box",
+    name: "Pavilion End / VIP Hospitality Box",
     shortName: "Pavilion VIP",
     desc: "Behind bowler's arm · Air-conditioned luxury lounge · Premium gourmet dining",
     mult: 3.5,
@@ -26,9 +26,9 @@ const CRICKET_STANDS = [
   },
   {
     id: "north",
-    name: "⚡ North Stand (Sachin Tendulkar Stand)",
+    name: "North Stand (Sachin Tendulkar Stand)",
     shortName: "North Stand",
-    desc: "Electric cheer atmosphere · Direct pitch straight-drive view",
+    desc: "Cheer atmosphere · Direct pitch straight-drive view",
     mult: 2.0,
     rows: ["NA", "NB", "NC"],
     cols: 16,
@@ -36,7 +36,7 @@ const CRICKET_STANDS = [
   },
   {
     id: "east",
-    name: "🏏 East Stand (Covered Upper Tier)",
+    name: "East Stand (Covered Upper Tier)",
     shortName: "East Stand",
     desc: "Panoramic 360° stadium vision · Full shaded covered roof",
     mult: 1.5,
@@ -46,9 +46,9 @@ const CRICKET_STANDS = [
   },
   {
     id: "west",
-    name: "🏟️ West Stand (Boundary Line / Lower Bowl)",
+    name: "West Stand (Boundary Line / Lower Bowl)",
     shortName: "West Stand",
-    desc: "Boundary rope edge action · Catch sixes right off the bat",
+    desc: "Boundary rope edge action · Field level view",
     mult: 1.2,
     rows: ["WA", "WB", "WC"],
     cols: 16,
@@ -56,7 +56,7 @@ const CRICKET_STANDS = [
   },
   {
     id: "south",
-    name: "🎟️ South Stand (Grandstand Upper)",
+    name: "South Stand (Grandstand Upper)",
     shortName: "Grandstand",
     desc: "High-angle tactical field view · High-energy fan chants",
     mult: 1.0,
@@ -467,7 +467,7 @@ export default function SeatsPage({ user, setShowLogin }) {
               boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
             }}
           >
-            ⚠️ {conflictMessage}
+            {conflictMessage}
           </motion.div>
         )}
       </AnimatePresence>
@@ -505,7 +505,7 @@ export default function SeatsPage({ user, setShowLogin }) {
                 maxWidth: 480,
               }}
             >
-              ⚡ LIVE STAGE / ARTIST DECK ⚡
+              LIVE STAGE / ARTIST DECK
             </div>
 
             <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", margin: "8px 0 20px" }}>
@@ -528,7 +528,7 @@ export default function SeatsPage({ user, setShowLogin }) {
                   justifyContent: "center",
                 }}
               >
-                🍸 VIP Deck (Left)
+                VIP Deck (Left)
               </div>
               <div
                 style={{
@@ -542,7 +542,7 @@ export default function SeatsPage({ user, setShowLogin }) {
                   boxShadow: "0 0 16px rgba(168,85,247,0.25)",
                 }}
               >
-                🌟 FAN PIT (Standing Front)
+                FAN PIT (Standing Front)
                 <div style={{ fontSize: 11, fontWeight: 500, opacity: 0.8, marginTop: 4 }}>
                   Direct Barrier View
                 </div>
@@ -561,7 +561,7 @@ export default function SeatsPage({ user, setShowLogin }) {
                   justifyContent: "center",
                 }}
               >
-                🍸 VIP Deck (Right)
+                VIP Deck (Right)
               </div>
             </div>
 
@@ -579,7 +579,7 @@ export default function SeatsPage({ user, setShowLogin }) {
                 margin: "12px auto 0",
               }}
             >
-              🎵 GOLD ZONE (Arena Floor Standing)
+              GOLD ZONE (Arena Floor Standing)
             </div>
 
             {/* Silver GA */}
@@ -596,7 +596,7 @@ export default function SeatsPage({ user, setShowLogin }) {
                 margin: "12px auto 0",
               }}
             >
-              🎟️ SILVER / GENERAL ADMISSION (GA Open Lawn)
+              SILVER / GENERAL ADMISSION (GA Open Lawn)
             </div>
           </div>
 
@@ -737,12 +737,6 @@ export default function SeatsPage({ user, setShowLogin }) {
               overflow: "hidden",
             }}
           >
-            {/* Stadium Floodlights glow */}
-            <div style={{ position: "absolute", top: 10, left: 16, fontSize: 20 }}>💡</div>
-            <div style={{ position: "absolute", top: 10, right: 16, fontSize: 20 }}>💡</div>
-            <div style={{ position: "absolute", bottom: 10, left: 16, fontSize: 20 }}>💡</div>
-            <div style={{ position: "absolute", bottom: 10, right: 16, fontSize: 20 }}>💡</div>
-
             {/* Boundary Rope & 30 Yard Circle */}
             <div
               style={{
@@ -783,7 +777,7 @@ export default function SeatsPage({ user, setShowLogin }) {
             </div>
 
             <div style={{ fontSize: 13, fontWeight: 700, marginTop: 12, letterSpacing: 1 }}>
-              🏏 {event.venue?.toUpperCase() || "INTERNATIONAL CRICKET STADIUM"} · 22-YARD PITCH & OUTFIELD
+              {event.venue?.toUpperCase() || "INTERNATIONAL CRICKET STADIUM"} · 22-YARD PITCH & OUTFIELD
             </div>
           </div>
 
@@ -836,7 +830,7 @@ export default function SeatsPage({ user, setShowLogin }) {
               alignItems: "center",
             }}
           >
-            <span>📍 <strong>{activeStand.name}</strong> — {activeStand.desc}</span>
+            <span><strong>{activeStand.name}</strong> — {activeStand.desc}</span>
             <span style={{ fontWeight: 800, color: "var(--red)", fontSize: 14 }}>
               ₹{Math.round(event.price * activeStand.mult).toLocaleString()}
             </span>

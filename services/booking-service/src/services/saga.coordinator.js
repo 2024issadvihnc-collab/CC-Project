@@ -123,7 +123,7 @@ export const sagaCoordinator = {
       createNotification({
         userId,
         type: "BOOKING_CONFIRMED",
-        title: "Booking Confirmed! 🎟️",
+        title: "Booking Confirmed!",
         message: `Your booking for "${pendingBooking.event?.title || "Event"}" (${seats.join(", ")}) is confirmed. Total: ₹${Number(total).toLocaleString()}`,
         data: { bookingId, eventId, seats, total },
       }).catch(() => {});
@@ -135,7 +135,7 @@ export const sagaCoordinator = {
         body: JSON.stringify({
           userId,
           type: "BOOKING_CONFIRMED",
-          title: "Booking Confirmed! 🎟️",
+          title: "Booking Confirmed!",
           message: `Your booking for "${pendingBooking.event?.title || "Event"}" (${seats.join(", ")}) is confirmed. Total: ₹${Number(total).toLocaleString()}`,
           data: { bookingId, eventId, seats, total },
         }),

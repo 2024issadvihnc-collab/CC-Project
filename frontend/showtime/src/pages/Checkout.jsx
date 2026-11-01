@@ -227,8 +227,8 @@ export default function Checkout({ user, setShowLogin, addTicket }) {
               {touched.email && !isEmailValid && (
                 <small style={{ color: "var(--red)", fontSize: 11, marginTop: 4, display: "block", fontWeight: 600 }}>
                   {!email.trim()
-                    ? "⚠️ Email address is compulsory to receive tickets & QR pass."
-                    : "⚠️ Please enter a correct email address format (e.g. name@example.com)."}
+                    ? "Email address is compulsory to receive tickets & QR pass."
+                    : "Please enter a correct email address format (e.g. name@example.com)."}
                 </small>
               )}
             </div>
@@ -310,8 +310,8 @@ export default function Checkout({ user, setShowLogin, addTicket }) {
                 {touched.upi && !isUpiValid && (
                   <small style={{ color: "var(--red)", fontSize: 11, marginTop: 4, display: "block", fontWeight: 600 }}>
                     {!upiId.trim()
-                      ? "⚠️ Entering a correct UPI ID is compulsory for UPI payments."
-                      : "⚠️ Incorrect UPI ID format. Must include username and bank handle (e.g. name@okaxis or 9876543210@paytm)."}
+                      ? "Entering a correct UPI ID is compulsory for UPI payments."
+                      : "Incorrect UPI ID format. Must include username and bank handle (e.g. name@okaxis or 9876543210@paytm)."}
                   </small>
                 )}
                 {/* Popular Bank Handles quick-fill */}
@@ -423,7 +423,7 @@ export default function Checkout({ user, setShowLogin, addTicket }) {
                   textAlign: "center",
                 }}
               >
-                ⚠️ {formError}
+                {formError}
               </div>
             )}
 

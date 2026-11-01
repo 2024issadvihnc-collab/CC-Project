@@ -381,7 +381,7 @@ export default function ProfileSettingsModal({
               }}
             >
               <span style={{ color: "#475569" }}>
-                🔒 Want to update your account password?
+                Want to update your account password?
               </span>
               <button
                 type="button"
@@ -498,7 +498,7 @@ export default function ProfileSettingsModal({
             )}
             {passError && (
               <div style={{ background: "#fdecea", color: "var(--red)", padding: "10px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
-                <span>⚠</span> {passError}
+                {passError}
               </div>
             )}
 
@@ -705,7 +705,7 @@ export default function ProfileSettingsModal({
                 lineHeight: 1.5,
               }}
             >
-              🔒 <strong>Security Notice:</strong> Your password is cryptographically salted and hashed. Updating your password will require entering your new password the next time you sign in.
+              <strong>Security Notice:</strong> Your password is cryptographically salted and hashed. Updating your password will require entering your new password the next time you sign in.
             </div>
 
             {/* Action Buttons */}
