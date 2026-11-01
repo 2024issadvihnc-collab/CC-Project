@@ -204,5 +204,108 @@ export const authService = {
     if (!deleted) throw new Error("Account not found or already deleted");
     return { success: true, message: "Account deleted successfully" };
   },
+
+  async googleLogin({ email, name, googleId, idToken, photoUrl }) {
+    if (!email) throw new Error("Google email address is required");
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail.includes("@")) throw new Error("A valid email address is required");
+
+    let user = await userRepo.findByEmail(cleanEmail);
+    if (!user) {
+      // Auto-register new Google user
+      const userId = "usr_g_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      const generatedPhone = "+91 9" + Math.floor(100000000 + Math.random() * 900000000).toString().slice(0, 9);
+      const passwordHash = await bcrypt.hash("google_oauth_" + Date.now() + Math.random(), SALT_ROUNDS);
+
+      user = await userRepo.createUser({
+        id: userId,
+        name: name || cleanEmail.split("@")[0],
+        email: cleanEmail,
+        phone: generatedPhone,
+        passwordHash,
+        role: "user",
+        preferences: { city: "Mumbai", notifications: true, authProvider: "google" },
+      });
+
+      createNotification({
+        userId: user.id,
+        type: "WELCOME",
+        title: "Welcome to ShowTime!",
+        message: `Hi ${user.name}, your account has been connected with Google (${cleanEmail}).`,
+        data: { userId: user.id, email: user.email },
+      }).catch(() => {});
+    }
+
+    const tokenPayload = {
+      id: user.id,
+      name: user.name,
+      phone: user.phone,
+      email: user.email,
+      role: user.role || "user",
+    };
+    const accessToken = signAccessToken(tokenPayload, config.jwtSecret, config.jwtAccessExpiresIn);
+    const refreshToken = signRefreshToken(tokenPayload, config.jwtSecret, config.jwtRefreshExpiresIn);
+
+    return {
+      user: {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        email: user.email,
+        role: user.role || "user",
+        preferences: user.preferences,
+      },
+      token: accessToken,
+      refreshToken,
+    };
+  },
+
+  async loginOrRegisterOtpUser(target) {
+    let user = await userRepo.findByIdentifier(target);
+    if (!user) {
+      const isEmail = target.includes("@");
+      const userId = "usr_otp_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      const passwordHash = await bcrypt.hash("otp_login_" + Date.now(), SALT_ROUNDS);
+      const phone = isEmail
+        ? "+91 9" + Math.floor(100000000 + Math.random() * 900000000).toString().slice(0, 9)
+        : `+91 ${target.replace(/\D/g, "").slice(-10)}`;
+      const email = isEmail ? target.trim().toLowerCase() : null;
+      const name = isEmail ? target.split("@")[0] : `User ${target.replace(/\D/g, "").slice(-4)}`;
+
+      user = await userRepo.createUser({
+        id: userId,
+        name,
+        email,
+        phone,
+        passwordHash,
+        role: "user",
+        preferences: { city: "Mumbai", notifications: true },
+      });
+    }
+
+    const tokenPayload = {
+      id: user.id,
+      name: user.name,
+      phone: user.phone,
+      email: user.email,
+      role: user.role || "user",
+    };
+    const accessToken = signAccessToken(tokenPayload, config.jwtSecret, config.jwtAccessExpiresIn);
+    const refreshToken = signRefreshToken(tokenPayload, config.jwtSecret, config.jwtRefreshExpiresIn);
+
+    return {
+      verified: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        email: user.email,
+        role: user.role || "user",
+        preferences: user.preferences,
+      },
+      token: accessToken,
+      refreshToken,
+    };
+  },
 };
 

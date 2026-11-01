@@ -48,7 +48,7 @@ export const bookingRepo = {
            FROM booking_seats
            WHERE event_id = $1
              AND seat_number = ANY($2::text[])
-             AND reservation_status IN ('HELD', 'CONFIRMED')
+             AND (reservation_status = 'CONFIRMED' OR (reservation_status = 'HELD' AND (hold_expires_at IS NULL OR hold_expires_at > NOW())))
            FOR UPDATE`,
           [eventId, seats]
         );
@@ -325,12 +325,13 @@ export const bookingRepo = {
   async getBookedSeatsForEvent(eventId) {
     if (isDbConnected()) {
       const res = await query(
-        `SELECT seat_number
+        `SELECT DISTINCT seat_number
          FROM booking_seats
-         WHERE event_id = $1 AND reservation_status IN ('HELD', 'CONFIRMED')`,
+         WHERE event_id = $1
+           AND (reservation_status = 'CONFIRMED' OR (reservation_status = 'HELD' AND (hold_expires_at IS NULL OR hold_expires_at > NOW())))`,
         [eventId]
       );
-      return res.rows.map((r) => r.seat_number);
+      return [...new Set(res.rows.map((r) => r.seat_number))];
     }
 
     const bookings = readJsonBookings();
@@ -341,7 +342,7 @@ export const bookingRepo = {
     eventBookings.forEach((b) => {
       if (Array.isArray(b.seats)) seats.push(...b.seats);
     });
-    return seats;
+    return [...new Set(seats)];
   },
 
   async cancelBooking(bookingId, reason = "Payment failed or cancelled") {

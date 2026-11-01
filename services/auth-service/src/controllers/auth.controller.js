@@ -23,11 +23,22 @@ export const authController = {
     }
   },
 
+  async googleAuth(req, res) {
+    try {
+      const { email, name, googleId, idToken, photoUrl } = req.body;
+      const result = await authService.googleLogin({ email, name, googleId, idToken, photoUrl });
+      return sendSuccess(res, result, "Logged in with Google successfully", 200);
+    } catch (err) {
+      return sendError(res, err, 400);
+    }
+  },
+
   async sendOtp(req, res) {
     try {
-      const { phone } = req.body;
-      if (!phone) return sendError(res, new Error("Phone number is required"), 400);
-      const result = await otpService.generateAndSaveOtp(phone);
+      const { phone, email, identifier } = req.body;
+      const target = identifier || phone || email;
+      if (!target) return sendError(res, new Error("Phone number or email is required"), 400);
+      const result = await otpService.generateAndSaveOtp(target);
       return sendSuccess(res, result, "OTP sent successfully");
     } catch (err) {
       return sendError(res, err, 400);
@@ -36,12 +47,15 @@ export const authController = {
 
   async verifyOtp(req, res) {
     try {
-      const { phone, otp } = req.body;
-      const result = await otpService.verifyOtp(phone, otp);
+      const { phone, email, identifier, otp } = req.body;
+      const target = identifier || phone || email;
+      if (!target) return sendError(res, new Error("Phone number or email is required"), 400);
+      const result = await otpService.verifyOtp(target, otp);
       if (!result.valid) {
         return sendError(res, new Error(result.reason || "Invalid OTP"), 400);
       }
-      return sendSuccess(res, { verified: true }, "OTP verified successfully");
+      const authResult = await authService.loginOrRegisterOtpUser(target);
+      return sendSuccess(res, authResult, "OTP verified successfully");
     } catch (err) {
       return sendError(res, err, 400);
     }

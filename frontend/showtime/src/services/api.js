@@ -94,6 +94,17 @@ export async function loginUser({ identifier, password }) {
   return data;
 }
 
+export async function googleLogin({ email, name, googleId, idToken, photoUrl }) {
+  const res = await fetch(`${API_BASE}/auth/google`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, name, googleId, idToken, photoUrl }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Google sign-in failed");
+  return data.data || data;
+}
+
 export async function resetPassword({ identifier, newPassword }) {
   const res = await fetch(`${API_BASE}/auth/reset-password`, {
     method: "POST",
@@ -138,26 +149,30 @@ export async function deleteAccount({ userId, phone, email }) {
   return data;
 }
 
-export async function sendOtp(phone) {
+export async function sendOtp(identifier) {
+  const isEmail = String(identifier).includes("@");
+  const payload = isEmail ? { email: identifier, identifier } : { phone: identifier, identifier };
   const res = await fetch(`${API_BASE}/auth/send-otp`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone }),
+    body: JSON.stringify(payload),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to send OTP");
   return data;
 }
 
-export async function verifyOtp(phone, otp) {
+export async function verifyOtp(identifier, otp) {
+  const isEmail = String(identifier).includes("@");
+  const payload = isEmail ? { email: identifier, identifier, otp } : { phone: identifier, identifier, otp };
   const res = await fetch(`${API_BASE}/auth/verify-otp`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone, otp }),
+    body: JSON.stringify(payload),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Invalid OTP");
-  return data;
+  return data.data || data;
 }
 
 export async function initiatePayment(payload) {

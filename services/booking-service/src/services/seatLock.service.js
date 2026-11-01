@@ -18,19 +18,50 @@ export const seatLockService = {
       try {
         for (const seat of seats) {
           const lockKey = `lock:seat:${eventId}:${seat}`;
-          // Set if Not eXists with expiration (NX EX)
-          const result = await client.set(lockKey, userId || "guest", "EX", ttlSeconds, "NX");
-          if (!result) {
-            // Rollback already acquired locks
-            if (acquiredKeys.length > 0) {
-              await client.del(...acquiredKeys);
+
+          // Check if lock already exists
+          const existingRaw = await client.get(lockKey);
+          if (existingRaw) {
+            let canAcquire = false;
+            try {
+              const existing = JSON.parse(existingRaw);
+              const lockOwner = existing.lockedBy || existing.userId;
+              // If lock was acquired by this user or during frontend seat selection (guest_/client_/usr_), allow checkout
+              if (
+                !lockOwner ||
+                lockOwner === userId ||
+                lockOwner.startsWith("guest_") ||
+                lockOwner.startsWith("client_") ||
+                lockOwner.startsWith("usr_")
+              ) {
+                canAcquire = true;
+              }
+            } catch (_) {
+              if (!existingRaw || existingRaw === userId || existingRaw === "guest") {
+                canAcquire = true;
+              }
             }
-            return {
-              success: false,
-              conflictSeat: seat,
-              message: `Seat ${seat} is currently held by another user`,
-            };
+
+            if (!canAcquire) {
+              if (acquiredKeys.length > 0) {
+                await client.del(...acquiredKeys).catch(() => {});
+              }
+              return {
+                success: false,
+                conflictSeat: seat,
+                message: `Seat ${seat} is currently held by another user`,
+              };
+            }
           }
+
+          // Secure lock for the current booking transaction
+          const lockData = JSON.stringify({
+            eventId,
+            seat,
+            lockedBy: userId || "guest",
+            expiresAt: Date.now() + ttlSeconds * 1000,
+          });
+          await client.set(lockKey, lockData, "EX", ttlSeconds);
           acquiredKeys.push(lockKey);
         }
         return { success: true, acquiredKeys };

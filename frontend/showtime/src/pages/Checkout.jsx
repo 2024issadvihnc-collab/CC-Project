@@ -140,19 +140,9 @@ export default function Checkout({ user, setShowLogin, addTicket }) {
         window.scrollTo({ top: 0, left: 0, behavior: "instant" });
         navigate(`/confirmation/${confirmedBooking.bookingId}`);
       }, 1000);
-    } catch {
-      // Offline fallback
-      const bookingId = "ST" + Math.random().toString(36).slice(2, 8).toUpperCase();
-      const bookingObj = {
-        bookingId,
-        ...payload,
-        paidAt: new Date().toISOString(),
-      };
-      addTicket(bookingObj);
-      setTimeout(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-        navigate(`/confirmation/${bookingId}`);
-      }, 1000);
+    } catch (err) {
+      setProcessing(false);
+      setFormError(err.message || "Booking failed. The selected seats may already be reserved. Please try again.");
     }
   };
 
