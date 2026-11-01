@@ -114,10 +114,10 @@ CREATE TABLE IF NOT EXISTS booking_schema.booking_seats (
 );
 
 -- CRITICAL CONCURRENCY REQUIREMENT:
--- Enforce that no two active (HELD or CONFIRMED) bookings can exist for the same seat of the same event
+-- Enforce that no two confirmed bookings can exist for the same seat of the same event
 CREATE UNIQUE INDEX IF NOT EXISTS uq_booking_active_seat
 ON booking_schema.booking_seats (event_id, seat_number)
-WHERE reservation_status IN ('HELD', 'CONFIRMED');
+WHERE reservation_status = 'CONFIRMED';
 
 CREATE INDEX IF NOT EXISTS idx_booking_seats_event_seat ON booking_schema.booking_seats(event_id, seat_number);
 CREATE INDEX IF NOT EXISTS idx_booking_seats_booking_id ON booking_schema.booking_seats(booking_id);

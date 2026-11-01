@@ -80,7 +80,11 @@ export default function LoginPage({ onLoginSuccess }) {
         password: regPassword,
       });
 
-      const userData = { ...res.user, token: res.token || res.user?.token };
+      const payload = res.data || res || {};
+      const userObj = payload.user || (payload.id ? payload : {});
+      const token = payload.token || res.token || userObj?.token;
+      const userData = { ...userObj, token };
+      if (!userData.name && regName) userData.name = regName.trim();
       localStorage.setItem("showtime_user", JSON.stringify(userData));
       if (onLoginSuccess) onLoginSuccess(userData);
       navigate(from, { replace: true });
@@ -113,7 +117,11 @@ export default function LoginPage({ onLoginSuccess }) {
         password: loginPassword,
       });
 
-      const userData = { ...res.user, token: res.token || res.user?.token };
+      const payload = res.data || res || {};
+      const userObj = payload.user || (payload.id ? payload : {});
+      const token = payload.token || res.token || userObj?.token;
+      const userData = { ...userObj, token };
+      if (!userData.name && regName) userData.name = regName.trim();
       localStorage.setItem("showtime_user", JSON.stringify(userData));
       if (onLoginSuccess) onLoginSuccess(userData);
       navigate(from, { replace: true });
@@ -180,11 +188,16 @@ export default function LoginPage({ onLoginSuccess }) {
     const target = otpPhone.trim();
     try {
       const res = await apiVerifyOtp(target, codeStr);
-      const userData = { ...(res.user || {}), token: res.token || res.user?.token };
+      const payload = res.data || res || {};
+      const userObj = payload.user || (payload.id ? payload : {});
+      const token = payload.token || res.token || userObj?.token;
+      const userData = { ...userObj, token };
       if (!userData.phone && !userData.email) {
         if (target.includes("@")) userData.email = target;
         else userData.phone = `+91 ${target.replace(/\D/g, "").slice(-10)}`;
-        userData.name = userData.name || "ShowTime User";
+      }
+      if (!userData.name) {
+        userData.name = target.includes("@") ? target.split("@")[0] : `User ${target.replace(/\D/g, "").slice(-4)}`;
       }
       localStorage.setItem("showtime_user", JSON.stringify(userData));
       if (onLoginSuccess) onLoginSuccess(userData);

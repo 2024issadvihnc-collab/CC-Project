@@ -43,7 +43,18 @@ export default function App() {
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem("showtime_user");
-      return saved ? JSON.parse(saved) : null;
+      if (!saved) return null;
+      let parsed = JSON.parse(saved);
+      if ((!parsed.name || parsed.name === "ShowTime User") && parsed.token) {
+        try {
+          const payload = JSON.parse(atob(parsed.token.split(".")[1]));
+          if (payload?.name) {
+            parsed.name = payload.name;
+            localStorage.setItem("showtime_user", JSON.stringify(parsed));
+          }
+        } catch (_) {}
+      }
+      return parsed;
     } catch {
       return null;
     }

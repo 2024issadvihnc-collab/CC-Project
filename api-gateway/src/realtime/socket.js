@@ -111,49 +111,10 @@ export function setupSocketIO(httpServer) {
       socket.join(room);
       console.log(`[Socket.IO Gateway] ${socket.id} joined room ${room}`);
 
-      const now = Date.now();
-      const currentHolds = [];
-
-      // Query Redis if available for active seat holds
-      if (isRedisAvailable && redisPubClient) {
-        try {
-          const keys = await redisPubClient.keys(`lock:seat:${eventId}:*`);
-          for (const key of keys) {
-            const raw = await redisPubClient.get(key);
-            if (raw) {
-              const lock = JSON.parse(raw);
-              if (lock.expiresAt > now) {
-                currentHolds.push({
-                  seatId: lock.seatId,
-                  lockedBy: lock.lockedBy,
-                  expiresAt: lock.expiresAt,
-                  isMine: lock.lockedBy === clientId,
-                });
-              }
-            }
-          }
-        } catch (_) {}
-      } else {
-        // In-memory fallback
-        for (const [key, lock] of fallbackLocks.entries()) {
-          if (lock.eventId === eventId) {
-            if (lock.expiresAt > now) {
-              currentHolds.push({
-                seatId: lock.seatId,
-                lockedBy: lock.lockedBy,
-                expiresAt: lock.expiresAt,
-                isMine: lock.lockedBy === clientId,
-              });
-            } else {
-              fallbackLocks.delete(key);
-            }
-          }
-        }
-      }
-
+      // No held/withheld seats snapshot
       socket.emit("event:seat_snapshot", {
         eventId,
-        heldSeats: currentHolds,
+        heldSeats: [],
       });
     });
 
@@ -165,122 +126,21 @@ export function setupSocketIO(httpServer) {
       console.log(`[Socket.IO Gateway] ${socket.id} left room ${room}`);
     });
 
-    // 3. Temporarily Hold / Lock Seat (Redis with TTL & Mutex)
-    socket.on("seat:hold", async ({ eventId, seatId, durationSeconds = 120 }, callback) => {
+    // 3. Seat selection (No temporary withholding)
+    socket.on("seat:hold", async ({ eventId, seatId }, callback) => {
       if (!eventId || !seatId) {
         if (typeof callback === "function") callback({ success: false, reason: "Missing eventId or seatId" });
         return;
       }
-
       const lockKey = `${eventId}:${seatId}`;
-      const redisKey = `lock:seat:${eventId}:${seatId}`;
-      const now = Date.now();
-      const expiresAt = now + durationSeconds * 1000;
-
-      // Check if permanently booked
       if (permanentlyBookedSeats.has(lockKey)) {
         const errorPayload = { success: false, seatId, reason: "Seat is already booked and unavailable" };
         socket.emit("seat:lock_failed", errorPayload);
         if (typeof callback === "function") callback(errorPayload);
         return;
       }
-
-      // ── REDIS DISTRIBUTED SEAT LOCK ──
-      if (isRedisAvailable && redisPubClient) {
-        try {
-          const lockPayload = JSON.stringify({
-            eventId,
-            seatId,
-            lockedBy: clientId,
-            expiresAt,
-          });
-
-          // Atomic SET if Not eXists with expiry (NX EX)
-          const acquired = await redisPubClient.set(redisKey, lockPayload, "EX", durationSeconds, "NX");
-
-          if (!acquired) {
-            // Check existing lock to verify if it belongs to current user renewing
-            const existingRaw = await redisPubClient.get(redisKey);
-            const existing = existingRaw ? JSON.parse(existingRaw) : null;
-
-            if (existing && existing.lockedBy === clientId) {
-              // Renew lock
-              await redisPubClient.set(redisKey, lockPayload, "EX", durationSeconds);
-            } else {
-              const errorPayload = {
-                success: false,
-                seatId,
-                reason: "Seat is currently held by another user",
-                lockedBy: existing?.lockedBy,
-                expiresAt: existing?.expiresAt,
-              };
-              socket.emit("seat:lock_failed", errorPayload);
-              if (typeof callback === "function") callback(errorPayload);
-              return;
-            }
-          }
-
-          // Broadcast to event room across all server instances
-          io.to(`event:${eventId}`).emit("seat:held", {
-            eventId,
-            seatId,
-            lockedBy: clientId,
-            expiresAt,
-          });
-
-          if (typeof callback === "function") {
-            callback({ success: true, seatId, expiresAt });
-          }
-          return;
-        } catch (err) {
-          console.warn("[Socket.IO Redis] Seat lock Redis error, using fallback:", err.message);
-        }
-      }
-
-      // ── IN-MEMORY FALLBACK ──
-      const existing = fallbackLocks.get(lockKey);
-      if (existing && existing.expiresAt > now && existing.lockedBy !== clientId) {
-        const errorPayload = {
-          success: false,
-          seatId,
-          reason: "Seat is currently held by another user",
-          lockedBy: existing.lockedBy,
-          expiresAt: existing.expiresAt,
-        };
-        socket.emit("seat:lock_failed", errorPayload);
-        if (typeof callback === "function") callback(errorPayload);
-        return;
-      }
-
-      if (existing?.timer) {
-        clearTimeout(existing.timer);
-      }
-
-      const timer = setTimeout(() => {
-        if (fallbackLocks.has(lockKey) && !permanentlyBookedSeats.has(lockKey)) {
-          fallbackLocks.delete(lockKey);
-          console.log(`[Socket.IO Gateway] Lock expired for ${lockKey}`);
-          io.to(`event:${eventId}`).emit("seat:released", { eventId, seatId });
-        }
-      }, durationSeconds * 1000);
-
-      fallbackLocks.set(lockKey, {
-        eventId,
-        seatId,
-        lockedBy: clientId,
-        expiresAt,
-        timer,
-      });
-
-      io.to(`event:${eventId}`).emit("seat:held", {
-        eventId,
-        seatId,
-        lockedBy: clientId,
-        expiresAt,
-      });
-
       if (typeof callback === "function") {
-        callback({ success: true, seatId, expiresAt });
+        callback({ success: true, seatId });
       }
     });
 

@@ -414,7 +414,7 @@ export default function Navbar({ city, setCity, user, setShowLogin, onSignOut, o
                     {userInitial}
                   </span>
                   <span style={{ fontWeight: 700, fontSize: 13, color: "#ffffff", maxWidth: 130, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {user.name || "ShowTime User"}
+                    {user.name || user.fullName || (user.email ? user.email.split("@")[0] : null) || user.phone || "User"}
                   </span>
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ opacity: 0.8, marginLeft: 2 }}>
                     <path d="M7 10l5 5 5-5z" />
@@ -430,7 +430,7 @@ export default function Navbar({ city, setCity, user, setShowLogin, onSignOut, o
                       style={{ width: 230 }}
                     >
                       <p>
-                        {user.name || "ShowTime User"}
+                        {user.name || user.fullName || (user.email ? user.email.split("@")[0] : null) || user.phone || "User"}
                         <small>{user.email || user.phone}</small>
                       </p>
                       <button

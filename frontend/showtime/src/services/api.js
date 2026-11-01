@@ -80,7 +80,7 @@ export async function registerUser({ name, phone, email, password }) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Registration failed");
-  return data;
+  return data.data || data;
 }
 
 export async function loginUser({ identifier, password }) {
@@ -91,7 +91,7 @@ export async function loginUser({ identifier, password }) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Login failed");
-  return data;
+  return data.data || data;
 }
 
 export async function googleLogin({ email, name, googleId, idToken, photoUrl }) {

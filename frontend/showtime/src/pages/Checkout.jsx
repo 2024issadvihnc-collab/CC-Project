@@ -38,7 +38,7 @@ export default function Checkout({ user, setShowLogin, addTicket }) {
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState(0);
   const [couponMsg, setCouponMsg] = useState("");
-  const [name, setName] = useState(user?.name || user?.phone || "ShowTime User");
+  const [name, setName] = useState(user?.name || user?.fullName || (user?.email ? user.email.split("@")[0] : null) || user?.phone || "Guest Customer");
   const [email, setEmail] = useState(user?.email || "");
   const [touched, setTouched] = useState({ email: false, upi: false, name: false });
   const [formError, setFormError] = useState("");

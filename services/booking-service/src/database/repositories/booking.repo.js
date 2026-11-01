@@ -42,13 +42,13 @@ export const bookingRepo = {
   }) {
     if (isDbConnected()) {
       return await withTransaction(async (client) => {
-        // 1. Lock and verify seat availability
+        // 1. Lock and verify seat availability (only confirmed bookings conflict)
         const seatCheckRes = await client.query(
           `SELECT seat_number
            FROM booking_seats
            WHERE event_id = $1
              AND seat_number = ANY($2::text[])
-             AND (reservation_status = 'CONFIRMED' OR (reservation_status = 'HELD' AND (hold_expires_at IS NULL OR hold_expires_at > NOW())))
+             AND reservation_status = 'CONFIRMED'
            FOR UPDATE`,
           [eventId, seats]
         );
@@ -56,7 +56,7 @@ export const bookingRepo = {
         if (seatCheckRes.rows.length > 0) {
           const conflicting = seatCheckRes.rows.map((r) => r.seat_number);
           throw new SeatConflictError(
-            `Seat(s) ${conflicting.join(", ")} are already reserved or booked. Please select different seats.`,
+            `Seat(s) ${conflicting.join(", ")} are already booked. Please select different seats.`,
             conflicting
           );
         }
@@ -328,7 +328,7 @@ export const bookingRepo = {
         `SELECT DISTINCT seat_number
          FROM booking_seats
          WHERE event_id = $1
-           AND (reservation_status = 'CONFIRMED' OR (reservation_status = 'HELD' AND (hold_expires_at IS NULL OR hold_expires_at > NOW())))`,
+           AND reservation_status = 'CONFIRMED'`,
         [eventId]
       );
       return [...new Set(res.rows.map((r) => r.seat_number))];
