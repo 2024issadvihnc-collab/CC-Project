@@ -14,11 +14,61 @@ const CINEMA_TIERS = [
 
 // ── CRICKET STADIUM STANDS ──
 const CRICKET_STANDS = [
-  { id: "north", name: "North Stand", tag: "Pitch Straight View", mult: 2.0, rows: ["A", "B", "C"], cols: 16, aisles: [4, 11] },
-  { id: "pavilion", name: "Pavilion VIP Box", tag: "Luxury Lounge & Dining", mult: 3.5, rows: ["A", "B"], cols: 14, aisles: [4, 9] },
-  { id: "east", name: "East Stand", tag: "Covered Upper Tier", mult: 1.5, rows: ["A", "B", "C"], cols: 16, aisles: [4, 11] },
-  { id: "west", name: "West Stand", tag: "Boundary Line Action", mult: 1.2, rows: ["A", "B", "C"], cols: 16, aisles: [4, 11] },
-  { id: "south", name: "South Grandstand", tag: "Panoramic Field View", mult: 1.0, rows: ["A", "B", "C", "D"], cols: 18, aisles: [4, 13] },
+  {
+    id: "north",
+    name: "North Stand",
+    tag: "Pitch Straight View",
+    gate: "Gate 3 & 4",
+    mult: 2.0,
+    rows: ["A", "B", "C"],
+    cols: 16,
+    aisles: [4, 11],
+    svgPos: { x: 270, y: 56, label: "North Stand" },
+  },
+  {
+    id: "pavilion",
+    name: "Pavilion VIP Box",
+    tag: "Luxury Lounge & Dining",
+    gate: "Club Gate 1",
+    mult: 3.5,
+    rows: ["A", "B"],
+    cols: 14,
+    aisles: [4, 9],
+    svgPos: { x: 425, y: 82, label: "Pavilion VIP" },
+  },
+  {
+    id: "east",
+    name: "East Stand",
+    tag: "Covered Upper Tier",
+    gate: "Gate 6 & 7",
+    mult: 1.5,
+    rows: ["A", "B", "C"],
+    cols: 16,
+    aisles: [4, 11],
+    svgPos: { x: 450, y: 170, label: "East Stand" },
+  },
+  {
+    id: "west",
+    name: "West Stand",
+    tag: "Boundary Line Action",
+    gate: "Gate 8 & 9",
+    mult: 1.2,
+    rows: ["A", "B", "C"],
+    cols: 16,
+    aisles: [4, 11],
+    svgPos: { x: 90, y: 170, label: "West Stand" },
+  },
+  {
+    id: "south",
+    name: "South Grandstand",
+    tag: "Panoramic Field View",
+    gate: "Gate 11 & 12",
+    mult: 1.0,
+    rows: ["A", "B", "C", "D"],
+    cols: 18,
+    aisles: [4, 13],
+    svgPos: { x: 270, y: 265, label: "South Grandstand" },
+  },
 ];
 
 // ── CONCERT / MUSIC PASSES & ARENA ZONES ──
@@ -26,6 +76,7 @@ const CONCERT_PASSES = [
   {
     id: "fan_pit",
     name: "Fan Pit",
+    badge: "Fast Filling",
     tag: "Closest to Stage",
     sub: "Front row standing barrier access directly facing the live performance stage.",
     perks: ["Front barrier access", "Dedicated queue lane", "Complimentary wristband"],
@@ -36,6 +87,7 @@ const CONCERT_PASSES = [
   {
     id: "vip_deck",
     name: "VIP Lounge Deck",
+    badge: "Best View",
     tag: "Elevated Viewing",
     sub: "Elevated platform terrace with unobstructed stage line-of-sight and bar access.",
     perks: ["Elevated deck view", "Dedicated bar counter", "Fast-track entry"],
@@ -46,6 +98,7 @@ const CONCERT_PASSES = [
   {
     id: "gold_standing",
     name: "Gold Zone Standing",
+    badge: "Prime Acoustics",
     tag: "Acoustic Sweet Spot",
     sub: "High-energy center arena floor with prime sound balance and crowd atmosphere.",
     perks: ["Center floor standing", "Direct stage sightline", "High-power acoustics"],
@@ -56,6 +109,7 @@ const CONCERT_PASSES = [
   {
     id: "silver_ga",
     name: "General Admission",
+    badge: "Festival Lawn",
     tag: "Open Ground Lawn",
     sub: "Open lawn entry with access to festival food village and live LED projection screens.",
     perks: ["Open ground lawn access", "Food & beverage village access", "Full festival experience"],
@@ -463,23 +517,43 @@ export default function SeatsPage({ user, setShowLogin }) {
 
                 {/* Standing Zones Layout Diagram */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr 1fr", gap: 8, marginBottom: 8 }}>
-                  <div style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid #f59e0b", borderRadius: 6, padding: "12px 6px", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#fde68a" }}>
+                  <div
+                    onClick={() => document.getElementById("pass-card-vip_deck")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                    style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid #f59e0b", borderRadius: 6, padding: "12px 6px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#fde68a", cursor: "pointer", transition: "all 0.15s" }}
+                    title="Click to view VIP Lounge Deck passes"
+                  >
                     VIP Deck (Left)
                   </div>
-                  <div style={{ background: "rgba(139, 92, 246, 0.2)", border: "1px solid #8b5cf6", borderRadius: 6, padding: "14px 8px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#ddd6fe" }}>
-                    Fan Pit (Front Stage)
+                  <div
+                    onClick={() => document.getElementById("pass-card-fan_pit")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                    style={{ background: "rgba(139, 92, 246, 0.2)", border: "1px solid #8b5cf6", borderRadius: 6, padding: "14px 8px", textAlign: "center", fontSize: 12, fontWeight: 800, color: "#ddd6fe", cursor: "pointer", transition: "all 0.15s" }}
+                    title="Click to view Fan Pit passes"
+                  >
+                    Fan Pit (Front Stage Barrier)
                   </div>
-                  <div style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid #f59e0b", borderRadius: 6, padding: "12px 6px", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#fde68a" }}>
+                  <div
+                    onClick={() => document.getElementById("pass-card-vip_deck")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                    style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid #f59e0b", borderRadius: 6, padding: "12px 6px", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#fde68a", cursor: "pointer", transition: "all 0.15s" }}
+                    title="Click to view VIP Lounge Deck passes"
+                  >
                     VIP Deck (Right)
                   </div>
                 </div>
 
-                <div style={{ background: "rgba(59, 130, 246, 0.15)", border: "1px solid #3b82f6", borderRadius: 6, padding: "10px", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#bfdbfe", marginBottom: 8 }}>
-                  Gold Zone (Main Arena Floor)
+                <div
+                  onClick={() => document.getElementById("pass-card-gold_standing")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                  style={{ background: "rgba(59, 130, 246, 0.15)", border: "1px solid #3b82f6", borderRadius: 6, padding: "10px", textAlign: "center", fontSize: 11.5, fontWeight: 700, color: "#bfdbfe", marginBottom: 8, cursor: "pointer", transition: "all 0.15s" }}
+                  title="Click to view Gold Zone passes"
+                >
+                  Gold Zone (Main Arena Floor Standing)
                 </div>
 
-                <div style={{ background: "rgba(16, 185, 129, 0.12)", border: "1px solid #10b981", borderRadius: 6, padding: "10px", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#a7f3d0" }}>
-                  General Admission (Open Lawn)
+                <div
+                  onClick={() => document.getElementById("pass-card-silver_ga")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                  style={{ background: "rgba(16, 185, 129, 0.12)", border: "1px solid #10b981", borderRadius: 6, padding: "10px", textAlign: "center", fontSize: 11.5, fontWeight: 700, color: "#a7f3d0", cursor: "pointer", transition: "all 0.15s" }}
+                  title="Click to view General Admission passes"
+                >
+                  General Admission (Open Lawn & Festival Hub)
                 </div>
               </div>
 
@@ -492,12 +566,13 @@ export default function SeatsPage({ user, setShowLogin }) {
 
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {CONCERT_PASSES.map((p) => {
-                  const price = Math.round(event.price * p.mult);
+                  const price = Math.round(numPrice * p.mult);
                   const count = passCounts[p.id] || 0;
 
                   return (
                     <div
                       key={p.id}
+                      id={`pass-card-${p.id}`}
                       style={{
                         background: "#ffffff",
                         border: count > 0 ? "1.5px solid var(--red, #f84464)" : "1px solid #e4e4e7",
@@ -527,10 +602,24 @@ export default function SeatsPage({ user, setShowLogin }) {
                             <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--ink)" }}>
                               {p.name}
                             </h4>
+                            {p.badge && (
+                              <span
+                                style={{
+                                  fontSize: 10,
+                                  fontWeight: 700,
+                                  padding: "2px 7px",
+                                  borderRadius: 4,
+                                  background: "rgba(248,68,100,0.1)",
+                                  color: "var(--red, #f84464)",
+                                }}
+                              >
+                                {p.badge}
+                              </span>
+                            )}
                             <span
                               style={{
                                 fontSize: 10,
-                                fontWeight: 700,
+                                fontWeight: 600,
                                 padding: "2px 7px",
                                 borderRadius: 4,
                                 background: "#f4f4f5",
@@ -721,10 +810,132 @@ export default function SeatsPage({ user, setShowLogin }) {
       )}
 
       {/* =========================================================================
-          2. CRICKET STADIUM TICKETING (Stand-by-Stand Stadium View & Seat Grid)
+          2. CRICKET STADIUM TICKETING (Interactive Ground Map & Bucket Seat Grid)
           ========================================================================= */}
       {isCricket && (
         <div style={{ maxWidth: 960, margin: "20px auto 100px", padding: "0 16px" }}>
+          
+          {/* ── BOOKMYSHOW CRICKET STADIUM GROUND OVERVIEW ── */}
+          <div
+            style={{
+              background: "linear-gradient(180deg, #0b132b 0%, #1c2541 100%)",
+              borderRadius: 16,
+              padding: "20px 16px 16px",
+              marginBottom: 20,
+              boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+              color: "#fff",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, padding: "0 6px" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: "1px", textTransform: "uppercase", color: "#38bdf8" }}>
+                    Stadium Ground & Bay Layout
+                  </span>
+                  <span style={{ background: "rgba(56,189,248,0.15)", color: "#38bdf8", fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4 }}>
+                    Interactive
+                  </span>
+                </div>
+                <p style={{ margin: "3px 0 0", fontSize: 11.5, color: "#94a3b8" }}>
+                  Tap any stand on the stadium ring to view seat rows & pricing
+                </p>
+              </div>
+
+              <div style={{ textAlign: "right" }}>
+                <span style={{ fontSize: 11, color: "#64748b" }}>Venue:</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#f8fafc", marginLeft: 6 }}>
+                  {event.venue}
+                </span>
+              </div>
+            </div>
+
+            {/* SVG Stadium Oval with Stands */}
+            <div style={{ position: "relative", width: "100%", maxWidth: 640, margin: "0 auto" }}>
+              <svg viewBox="0 0 540 320" style={{ width: "100%", height: "auto", display: "block" }}>
+                <defs>
+                  <radialGradient id="outfieldGrad" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#22c55e" stopOpacity="0.85" />
+                    <stop offset="70%" stopColor="#15803d" stopOpacity="0.95" />
+                    <stop offset="100%" stopColor="#14532d" />
+                  </radialGradient>
+                  <filter id="standGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="#f84464" floodOpacity="0.5" />
+                  </filter>
+                </defs>
+
+                {/* Stadium Boundary Track & Grass Outfield */}
+                <ellipse cx="270" cy="160" rx="252" ry="144" fill="#0f172a" stroke="#334155" strokeWidth="2" />
+                <ellipse cx="270" cy="160" rx="230" ry="128" fill="url(#outfieldGrad)" stroke="#4ade80" strokeWidth="2" />
+                
+                {/* 30-Yard Inner Fielding Ring */}
+                <ellipse cx="270" cy="160" rx="140" ry="78" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeDasharray="5 5" />
+
+                {/* Cricket Pitch Strip (22 Yards) */}
+                <rect x="256" y="125" width="28" height="70" rx="3" fill="#ca8a04" stroke="#eab308" strokeWidth="1" />
+                {/* Bowling Creases */}
+                <line x1="254" y1="135" x2="286" y2="135" stroke="#ffffff" strokeWidth="1.5" />
+                <line x1="254" y1="185" x2="286" y2="185" stroke="#ffffff" strokeWidth="1.5" />
+                {/* Stumps / Wickets */}
+                <circle cx="265" cy="133" r="1.5" fill="#ffffff" />
+                <circle cx="270" cy="133" r="1.5" fill="#ffffff" />
+                <circle cx="275" cy="133" r="1.5" fill="#ffffff" />
+                <circle cx="265" cy="187" r="1.5" fill="#ffffff" />
+                <circle cx="270" cy="187" r="1.5" fill="#ffffff" />
+                <circle cx="275" cy="187" r="1.5" fill="#ffffff" />
+                <text x="270" y="163" fill="#ffffff" fontSize="8" fontWeight="800" textAnchor="middle" letterSpacing="1">
+                  PITCH
+                </text>
+
+                {/* 5 Interactive Clickable Stand Sectors */}
+                {CRICKET_STANDS.map((s) => {
+                  const active = activeStandId === s.id;
+                  const price = Math.round(numPrice * s.mult);
+                  const avail = standStats[s.id]?.available ?? 0;
+
+                  return (
+                    <g
+                      key={s.id}
+                      onClick={() => setActiveStandId(s.id)}
+                      style={{ cursor: "pointer", transition: "all 0.2s" }}
+                      filter={active ? "url(#standGlow)" : undefined}
+                    >
+                      <rect
+                        x={s.svgPos.x - 56}
+                        y={s.svgPos.y - 18}
+                        width="112"
+                        height="36"
+                        rx="8"
+                        fill={active ? "var(--red, #f84464)" : "#1e293b"}
+                        stroke={active ? "#ffffff" : "rgba(255,255,255,0.2)"}
+                        strokeWidth={active ? "2" : "1"}
+                      />
+                      <text
+                        x={s.svgPos.x}
+                        y={s.svgPos.y - 3}
+                        fill="#ffffff"
+                        fontSize="10"
+                        fontWeight="700"
+                        textAnchor="middle"
+                      >
+                        {s.name}
+                      </text>
+                      <text
+                        x={s.svgPos.x}
+                        y={s.svgPos.y + 11}
+                        fill={active ? "#ffffff" : "#94a3b8"}
+                        fontSize="9"
+                        fontWeight="600"
+                        textAnchor="middle"
+                      >
+                        ₹{price.toLocaleString()} · {avail} open
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
+          </div>
+
           {/* Stand selector tabs */}
           <div style={{ marginBottom: 16 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
@@ -766,7 +977,7 @@ export default function SeatsPage({ user, setShowLogin }) {
                       ₹{price.toLocaleString()} · {s.tag}
                     </div>
                     <div style={{ fontSize: 10, color: avail > 0 ? "#16a34a" : "#dc2626", fontWeight: 700, marginTop: 3 }}>
-                      {avail > 0 ? `${avail} open` : "Filling fast"}
+                      {s.gate} · {avail > 0 ? `${avail} open` : "Filling fast"}
                     </div>
                   </button>
                 );
@@ -779,9 +990,9 @@ export default function SeatsPage({ user, setShowLogin }) {
             <div className="seat-map">
               <div className="tier">
                 <div className="tier-name" style={{ textAlign: "center", borderBottom: "1px solid #f4f4f5", paddingBottom: 10, marginBottom: 18 }}>
-                  <strong style={{ color: "var(--ink)", fontSize: 14 }}>{activeStand.name}</strong> — ₹{Math.round(numPrice * activeStand.mult).toLocaleString()} per seat
+                  <strong style={{ color: "var(--ink)", fontSize: 14 }}>{activeStand.name} (Level 1, Bay A)</strong> — ₹{Math.round(numPrice * activeStand.mult).toLocaleString()} per seat
                   <div style={{ fontSize: 11, color: "#71717a", marginTop: 2 }}>
-                    {activeStand.tag} · {standStats[activeStand.id]?.available || 0} seats open for booking
+                    {activeStand.gate} · {activeStand.tag} · {standStats[activeStand.id]?.available || 0} seats open for booking
                   </div>
                 </div>
 
@@ -796,7 +1007,7 @@ export default function SeatsPage({ user, setShowLogin }) {
                       const isSold = soldSeats.has(key) || soldSeats.has(standPrefixed);
                       const isSel = selected.includes(key);
 
-                      let seatClass = "seat";
+                      let seatClass = "seat stadium";
                       if (isSold) seatClass += " sold";
                       else if (isSel) seatClass += " sel";
 
@@ -834,6 +1045,7 @@ export default function SeatsPage({ user, setShowLogin }) {
                         </span>
                       );
                     })}
+                    <span className="row-l" style={{ marginLeft: 8, marginRight: 0 }}>{rowLetter}</span>
                   </div>
                 ))}
               </div>
@@ -876,14 +1088,34 @@ export default function SeatsPage({ user, setShowLogin }) {
       )}
 
       {/* =========================================================================
-          3. CINEMA & AUDITORIUM SEATING (Screen at Top, Curved Rows)
+          3. CINEMA & AUDITORIUM SEATING (BookMyShow Screen at Top & Curved Rows)
           ========================================================================= */}
       {!isConcert && !isCricket && (
-        <div className="seat-scroll">
+        <div className="seat-scroll" style={{ padding: "16px 12px 100px" }}>
           <div className="seat-map">
+            
+            {/* BookMyShow Screen at Top with Arc & Glow */}
+            <div className="screen-wrap" style={{ margin: "16px auto 36px" }}>
+              <div style={{ position: "relative", width: "min(460px, 86vw)", margin: "0 auto" }}>
+                <svg viewBox="0 0 400 40" preserveAspectRatio="none" style={{ width: "100%", height: 36, overflow: "visible" }}>
+                  <defs>
+                    <linearGradient id="screenGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.2" />
+                      <stop offset="50%" stopColor="#0284c7" stopOpacity="0.9" />
+                      <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.2" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M 10 32 Q 200 6 390 32" stroke="url(#screenGlow)" strokeWidth="3.5" fill="none" strokeLinecap="round" />
+                </svg>
+                <div style={{ textAlign: "center", marginTop: 4, letterSpacing: "2.5px", fontSize: 11, fontWeight: 700, color: "#94a3b8" }}>
+                  ALL EYES THIS WAY PLEASE · SCREEN
+                </div>
+              </div>
+            </div>
+
             {CINEMA_TIERS.map((tier) => (
               <div className="tier" key={tier.id}>
-                <div className="tier-name">
+                <div className="tier-name" style={{ textAlign: "center", letterSpacing: "1px", color: "var(--ink2)", fontWeight: 700 }}>
                   ₹{Math.round(numPrice * tier.mult).toLocaleString()} {tier.name}
                 </div>
 
@@ -935,19 +1167,13 @@ export default function SeatsPage({ user, setShowLogin }) {
                         </span>
                       );
                     })}
+                    <span className="row-l" style={{ marginLeft: 8, marginRight: 0 }}>{rowLetter}</span>
                   </div>
                 ))}
               </div>
             ))}
 
-            <div className="screen-wrap">
-              <svg viewBox="0 0 400 50" preserveAspectRatio="none">
-                <path d="M10 40 Q200 5 390 40" stroke="#cbd5e1" strokeWidth="2.5" fill="none" />
-              </svg>
-              <p>All eyes this way please</p>
-            </div>
-
-            <div className="seat-legend">
+            <div className="seat-legend" style={{ marginTop: 24 }}>
               <span>
                 <i className="seat" /> Available
               </span>
@@ -971,7 +1197,7 @@ export default function SeatsPage({ user, setShowLogin }) {
               {selected.length > 3 ? ` +${selected.length - 3} more` : ""}
             </small>
             <div style={{ fontSize: 13, color: "var(--mut)", marginTop: 2 }}>
-              Total: <strong style={{ color: "var(--red)", fontSize: 17 }}>₹{Math.round(totalPrice).toLocaleString()}</strong>
+              Total: <strong style={{ color: "var(--red)", fontSize: 18 }}>₹{Math.round(totalPrice).toLocaleString()}</strong>
             </div>
           </div>
 
@@ -980,8 +1206,9 @@ export default function SeatsPage({ user, setShowLogin }) {
               className="btn-primary big"
               onClick={proceed}
               id="proceed-pay-btn"
+              style={{ padding: "12px 24px", fontSize: 15, fontWeight: 700 }}
             >
-              Proceed to Checkout
+              Book {totalCount} {totalCount === 1 ? "Ticket" : "Tickets"} · ₹{Math.round(totalPrice).toLocaleString()}
             </button>
           </div>
         </div>
