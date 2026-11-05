@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { getUserBookings, cancelBooking, getCancellationDetails } from "../services/api";
 
-export default function MyTickets({ tickets = [], user, setShowLogin }) {
+export default function MyTickets({ tickets = [], user, setShowLogin, onCancelTicket }) {
   const navigate = useNavigate();
   const [allTickets, setAllTickets] = useState(tickets);
   const [selectedBooking, setSelectedBooking] = useState(null);
@@ -14,24 +14,54 @@ export default function MyTickets({ tickets = [], user, setShowLogin }) {
   const [cancelError, setCancelError] = useState("");
   const [cancelSuccess, setCancelSuccess] = useState(null);
 
+  const getCancelledIds = () => {
+    try {
+      return JSON.parse(localStorage.getItem("showtime_cancelled_ids") || "[]");
+    } catch {
+      return [];
+    }
+  };
+
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    const cancelledIds = getCancelledIds();
+    const applyStatus = (list) =>
+      list.map((b) =>
+        cancelledIds.includes(b.bookingId)
+          ? {
+              ...b,
+              status: "CANCELLED",
+              booking_status: "CANCELLED",
+              isCancelled: true,
+              paymentStatus: "REFUNDED",
+            }
+          : b
+      );
+
     if (user?.phone || user?.email) {
       getUserBookings({ phone: user.phone, email: user.email }).then((serverBookings) => {
         if (serverBookings && serverBookings.length) {
           const combined = [...serverBookings];
           tickets.forEach((t) => {
-            if (!combined.some((c) => c.bookingId === t.bookingId)) {
+            const existingIdx = combined.findIndex((c) => c.bookingId === t.bookingId);
+            if (existingIdx === -1) {
               combined.push(t);
+            } else if (t.status === "CANCELLED" || cancelledIds.includes(t.bookingId)) {
+              combined[existingIdx] = {
+                ...combined[existingIdx],
+                status: "CANCELLED",
+                booking_status: "CANCELLED",
+                isCancelled: true,
+              };
             }
           });
-          setAllTickets(combined);
+          setAllTickets(applyStatus(combined));
         } else {
-          setAllTickets(tickets);
+          setAllTickets(applyStatus(tickets));
         }
       });
     } else {
-      setAllTickets(tickets);
+      setAllTickets(applyStatus(tickets));
     }
   }, [user, tickets]);
 
@@ -82,16 +112,34 @@ export default function MyTickets({ tickets = [], user, setShowLogin }) {
         reason: cancelReason,
       });
 
-      if (res && (res.success || res.status === "CANCELLED")) {
+      if (res && (res.success || res.status === "CANCELLED" || res.alreadyCancelled)) {
         setCancelSuccess(res.data || res);
-        // Update local list
+
+        // 1. Permanently remember this booking is cancelled in localStorage
+        try {
+          const stored = JSON.parse(localStorage.getItem("showtime_cancelled_ids") || "[]");
+          if (!stored.includes(selectedBooking.bookingId)) {
+            stored.push(selectedBooking.bookingId);
+            localStorage.setItem("showtime_cancelled_ids", JSON.stringify(stored));
+          }
+        } catch (_) {}
+
+        // 2. Notify parent App component
+        if (onCancelTicket) {
+          onCancelTicket(selectedBooking.bookingId);
+        }
+
+        // 3. Update local list permanently
         setAllTickets((prev) =>
           prev.map((b) =>
             b.bookingId === selectedBooking.bookingId
               ? {
                   ...b,
                   status: "CANCELLED",
+                  booking_status: "CANCELLED",
+                  isCancelled: true,
                   paymentStatus: "REFUNDED",
+                  payment_status: "REFUNDED",
                   refundAmount: res.data?.refundAmount || previewData?.refundAmount,
                 }
               : b
@@ -144,7 +192,14 @@ export default function MyTickets({ tickets = [], user, setShowLogin }) {
       ) : (
         <div className="orders" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {allTickets.map((booking) => {
-            const isCancelled = booking.status === "CANCELLED";
+            const isCancelled =
+              Boolean(booking.isCancelled) ||
+              String(booking.status || "").toUpperCase() === "CANCELLED" ||
+              String(booking.booking_status || "").toUpperCase() === "CANCELLED" ||
+              String(booking.paymentStatus || "").toUpperCase() === "REFUNDED" ||
+              String(booking.payment_status || "").toUpperCase() === "REFUNDED" ||
+              Boolean(booking.cancellation) ||
+              getCancelledIds().includes(booking.bookingId);
             return (
               <motion.div
                 key={booking.bookingId}
@@ -220,7 +275,23 @@ export default function MyTickets({ tickets = [], user, setShowLogin }) {
                   </div>
 
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    {!isCancelled && (
+                    {isCancelled ? (
+                      <span
+                        style={{
+                          background: "#fee2e2",
+                          color: "#dc2626",
+                          border: "1px solid #fecaca",
+                          padding: "6px 12px",
+                          borderRadius: 6,
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        Cancelled · Refunded
+                      </span>
+                    ) : (
                       <button
                         onClick={() => handleOpenCancelModal(booking)}
                         id={`cancel-btn-${booking.bookingId}`}

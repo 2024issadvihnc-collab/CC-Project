@@ -77,7 +77,13 @@ export default function Confirmation({ tickets = [] }) {
   }
 
   const { event, seats, total, paidAt, status } = booking;
-  const isCancelled = status === "CANCELLED";
+  let isCancelled = status === "CANCELLED" || booking.booking_status === "CANCELLED" || booking.isCancelled;
+  try {
+    const cancelledIds = JSON.parse(localStorage.getItem("showtime_cancelled_ids") || "[]");
+    if (cancelledIds.includes(bookingId) || (booking.bookingId && cancelledIds.includes(booking.bookingId))) {
+      isCancelled = true;
+    }
+  } catch (_) {}
   const paidDate = new Date(paidAt || Date.now());
   const eventDate = new Date(event?.date || Date.now());
 

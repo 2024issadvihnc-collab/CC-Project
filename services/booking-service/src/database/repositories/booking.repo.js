@@ -260,11 +260,11 @@ export const bookingRepo = {
         SELECT
           b.id, b.booking_reference AS "bookingId", b.event_id AS "eventId",
           b.total_amount AS total, b.booking_status AS status,
-          b.payment_method AS "paymentMethod", b.coupon_code AS coupon,
-          b.user_details AS user, b.event_snapshot AS event,
+          b.payment_method AS "paymentMethod", b.payment_status AS "paymentStatus",
+          b.coupon_code AS coupon, b.user_details AS user, b.event_snapshot AS event,
           b.created_at AS "paidAt"
         FROM bookings b
-        WHERE b.booking_status = 'CONFIRMED'
+        WHERE b.booking_status IN ('CONFIRMED', 'CANCELLED')
       `;
       const params = [];
 
@@ -288,7 +288,7 @@ export const bookingRepo = {
       const enriched = await Promise.all(
         bRes.rows.map(async (b) => {
           const sRes = await query(
-            `SELECT seat_number, tier, price FROM booking_seats WHERE booking_id = $1 AND reservation_status = 'CONFIRMED'`,
+            `SELECT seat_number, tier, price FROM booking_seats WHERE booking_id = $1`,
             [b.id]
           );
           return {
@@ -310,7 +310,7 @@ export const bookingRepo = {
     const cleanEmail = email ? email.trim().toLowerCase() : "";
 
     return bookings
-      .filter((b) => b.status === "CONFIRMED")
+      .filter((b) => b.status === "CONFIRMED" || b.status === "CANCELLED")
       .filter((b) => {
         const u = b.user || {};
         const uPhone = (u.phone || "").replace(/\D/g, "").slice(-10);
@@ -319,7 +319,11 @@ export const bookingRepo = {
         if (cleanEmail && uEmail === cleanEmail) return true;
         if (cleanPhone && uPhone.includes(cleanPhone)) return true;
         return false;
-      });
+      })
+      .map((b) => ({
+        ...b,
+        seats: (b.seats && b.seats.length > 0) ? b.seats : (b.releasedSeats || []),
+      }));
   },
 
   async getBookedSeatsForEvent(eventId) {

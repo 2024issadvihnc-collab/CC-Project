@@ -71,11 +71,45 @@ export default function App() {
     if (user?.phone || user?.email) {
       getUserBookings({ phone: user.phone, email: user.email }).then((data) => {
         if (data && data.length) {
-          setBookedTickets(data);
+          let cancelledIds = [];
+          try {
+            cancelledIds = JSON.parse(localStorage.getItem("showtime_cancelled_ids") || "[]");
+          } catch (_) {}
+          const marked = data.map((b) =>
+            cancelledIds.includes(b.bookingId)
+              ? { ...b, status: "CANCELLED", booking_status: "CANCELLED", isCancelled: true, paymentStatus: "REFUNDED" }
+              : b
+          );
+          setBookedTickets(marked);
         }
       });
     }
   }, [user]);
+
+  const handleCancelTicket = (bookingId) => {
+    try {
+      const cancelled = JSON.parse(localStorage.getItem("showtime_cancelled_ids") || "[]");
+      if (!cancelled.includes(bookingId)) {
+        cancelled.push(bookingId);
+        localStorage.setItem("showtime_cancelled_ids", JSON.stringify(cancelled));
+      }
+    } catch (_) {}
+
+    setBookedTickets((prev) =>
+      prev.map((t) =>
+        t.bookingId === bookingId
+          ? {
+              ...t,
+              status: "CANCELLED",
+              booking_status: "CANCELLED",
+              paymentStatus: "REFUNDED",
+              payment_status: "REFUNDED",
+              isCancelled: true,
+            }
+          : t
+      )
+    );
+  };
 
   const addToast = (msg, type = "info") => {
     const id = Date.now();
@@ -170,6 +204,7 @@ export default function App() {
               tickets={bookedTickets}
               user={user}
               setShowLogin={setShowLogin}
+              onCancelTicket={handleCancelTicket}
             />
           }
         />

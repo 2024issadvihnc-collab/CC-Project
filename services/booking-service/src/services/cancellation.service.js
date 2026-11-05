@@ -240,7 +240,7 @@ export const cancellationService = {
       createNotification({
         userId: notifUserId,
         type: "CANCELLATION",
-        title: "Booking Cancelled ↩️",
+        title: "Booking Cancelled",
         message: `Your booking ${bookingReference} for "${event.title || "Event"}" has been cancelled. Refund of ₹${refundInfo.refundAmount.toLocaleString()} has been initiated.`,
         data: {
           bookingReference,
@@ -256,7 +256,7 @@ export const cancellationService = {
         body: JSON.stringify({
           userId: notifUserId,
           type: "CANCELLATION",
-          title: "Booking Cancelled ↩️",
+          title: "Booking Cancelled",
           message: `Your booking ${bookingReference} for "${event.title || "Event"}" has been cancelled. Refund of ₹${refundInfo.refundAmount.toLocaleString()} has been initiated.`,
           data: {
             bookingReference,
